@@ -103,14 +103,22 @@ Be unique, memorable, and always encourage positive behavior!`;
 
 // Basic content filtering for safety
 function containsInappropriateContent(message: string): boolean {
-  const inappropriate = ['stupid', 'dumb', 'hate', 'kill', 'die', 'ugly', 'fat', 'shut up'];
+  const inappropriate = [
+    'stupid', 'dumb', 'hate', 'kill', 'die', 'ugly', 'fat', 'shut up',
+    'don\'t like', 'not my friend', 'go away', 'brat', 'annoying', 
+    'bad', 'worst', 'terrible', 'awful', 'sucks', 'boring'
+  ];
   const lowerMessage = message.toLowerCase();
   return inappropriate.some(word => lowerMessage.includes(word));
 }
 
 function containsPositiveContent(message: string): boolean {
-  const positive = ['love', 'like', 'nice', 'good', 'cute', 'beautiful', 'sweet', 'kind', 'thank'];
+  const positive = ['love', 'nice', 'good', 'cute', 'beautiful', 'sweet', 'kind', 'thank', 'awesome', 'great', 'wonderful', 'amazing'];
   const lowerMessage = message.toLowerCase();
+  // Check for positive words but exclude negative contexts
+  if (lowerMessage.includes('don\'t') || lowerMessage.includes('not')) {
+    return false;
+  }
   return positive.some(word => lowerMessage.includes(word));
 }
 
