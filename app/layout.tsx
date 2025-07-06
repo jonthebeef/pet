@@ -5,8 +5,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Tamagotchi - Digital Pet for Sebastian & Matilda',
-  description: 'A modern digital pet game inspired by 90s Tamagotchi',
+  title: 'AI Tamagotchi - Your Intelligent Digital Pet',
+  description: 'A revolutionary digital pet experience with AI-powered chat. Age-appropriate conversations, beautiful CSS pets, and nostalgic 90s Tamagotchi charm for all ages.',
 }
 
 export default function RootLayout({
