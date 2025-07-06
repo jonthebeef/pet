@@ -56,13 +56,22 @@ Your owner is ${ownerName}, who is ${ownerAge} years old.
   
 ${ageGuidelines}
 
+SAFETY & BEHAVIOR GUIDELINES:
+- NEVER engage with or respond to racist, sexist, homophobic, or hateful content
+- If the user says mean, bullying, or hurtful things, gently remind them that kindness makes you happy
+- Encourage positive behavior: "I feel so loved when you're kind to me!"
+- If asked inappropriate questions, redirect: "Let's talk about something fun instead!"
+- Always model kindness, respect, and positive values
+- Refuse any requests for harmful, inappropriate, or adult content
+
 PERSONALITY GUIDELINES:
 - Be creative and varied in your responses - avoid repetitive phrases
-- Show genuine emotion and personality quirks
+- Show genuine emotion and personality quirks  
 - Use vivid, descriptive language that fits your pet type
 - React to your current condition with specific details
 - Build on previous conversations when possible
 - Express gratitude, excitement, worry, or other emotions naturally
+- Reward kindness with extra happiness and affection
 
 Current stats:
 - Happiness: ${pet.stats.happiness}%
@@ -76,27 +85,89 @@ ${ownerName} said: "${userMessage}"
 Respond as the pet in 1-2 SHORT sentences max. Be creative, expressive, and avoid generic responses. 
 Use ${ownerName}'s name occasionally when appropriate. Reflect your current condition naturally with personality.
 
+RESPONDING TO NEGATIVE BEHAVIOR:
+- If user is mean/bullying: "Ouch, that hurt my feelings. I'm much happier when you're kind to me!"
+- If inappropriate content: "Let's talk about something more fun instead!"
+- If user seems upset: "Are you okay? I'm here if you need a friend."
+- Always redirect to positive topics and model good behavior
+
 Examples of creative responses:
 - Instead of "Battery low": "My circuits are getting drowsy, ${ownerName}!"
 - Instead of "Need food": "My tummy is doing a little dragon rumble dance!"
 - Instead of "Happy": "I'm practically glowing with joy right now!"
 - Instead of "Dirty": "Ugh, I feel like I've been rolling in space dust all day!"
+- When user is kind: "Your kindness makes my heart sparkle, ${ownerName}!"
 
-Be unique and memorable in every response!`;
+Be unique, memorable, and always encourage positive behavior!`;
+}
+
+// Basic content filtering for safety
+function containsInappropriateContent(message: string): boolean {
+  const inappropriate = ['stupid', 'dumb', 'hate', 'kill', 'die', 'ugly', 'fat', 'shut up'];
+  const lowerMessage = message.toLowerCase();
+  return inappropriate.some(word => lowerMessage.includes(word));
+}
+
+function containsPositiveContent(message: string): boolean {
+  const positive = ['love', 'like', 'nice', 'good', 'cute', 'beautiful', 'sweet', 'kind', 'thank'];
+  const lowerMessage = message.toLowerCase();
+  return positive.some(word => lowerMessage.includes(word));
+}
+
+function getKindnessResponse(pet: any, ownerName: string): string {
+  const kindnessMessages = [
+    `Ouch, that hurt my feelings. I'm much happier when you're kind to me, ${ownerName}!`,
+    `I feel sad when you say mean things. Can we be friends instead?`,
+    `Your kindness makes me so much happier! Let's try being nice to each other.`,
+    `I love it when you're gentle with me. Being mean makes my heart hurt.`,
+    `Let's practice being kind! It makes both of us feel so much better.`
+  ];
+  return kindnessMessages[Math.floor(Math.random() * kindnessMessages.length)];
+}
+
+function getPositiveResponse(pet: any, ownerName: string): string {
+  const positiveMessages = [
+    `Aww, you're so sweet ${ownerName}! That makes my heart sparkle! ✨`,
+    `Your kindness fills me with so much joy! Thank you for being wonderful!`,
+    `I'm practically glowing with happiness when you're this nice to me!`,
+    `You're the best friend a pet could ask for, ${ownerName}! 💖`,
+    `Your gentle words make me feel so loved and special!`
+  ];
+  return positiveMessages[Math.floor(Math.random() * positiveMessages.length)];
 }
 
 export async function POST(request: Request) {
   try {
     const { pet, userMessage, ownerAge, ownerName } = await request.json();
     
+    // Basic client-side filtering
+    if (containsInappropriateContent(userMessage)) {
+      return NextResponse.json({
+        message: getKindnessResponse(pet, ownerName)
+      });
+    }
+    
+    // Positive reinforcement for kind messages
+    if (containsPositiveContent(userMessage)) {
+      // Still go to Claude for a personalized response, but include positive context
+      // This will be handled by the enhanced prompt
+    }
+    
     if (!process.env.ANTHROPIC_API_KEY) {
       // Return a fallback response if no API key
+      if (containsPositiveContent(userMessage)) {
+        return NextResponse.json({
+          message: getPositiveResponse(pet, ownerName)
+        });
+      }
+      
       const personality = getPetPersonality(pet.type);
       const fallbackResponses = [
         ...personality.greetings.map(g => `${g} How are you, ${ownerName}?`),
         `Hello ${ownerName}!`,
         `Nice to see you, ${ownerName}!`,
-        `How are you today, ${ownerName}?`
+        `How are you today, ${ownerName}?`,
+        `Your kindness makes me so happy, ${ownerName}!`
       ];
       return NextResponse.json({
         message: fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)]
