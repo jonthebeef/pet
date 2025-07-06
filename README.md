@@ -136,8 +136,9 @@ npm run dev
 ### 🔑 Claude AI Setup (Recommended)
 1. Visit [Anthropic Console](https://console.anthropic.com/)
 2. Create an account and generate an API key
-3. Add to `.env.local`: `ANTHROPIC_API_KEY=sk-ant-api03-...`
-4. Restart the dev server
+3. **For local development**: Add to `.env.local`: `ANTHROPIC_API_KEY=sk-ant-api03-...`
+4. **For Netlify deployment**: Add the environment variable in your Netlify dashboard under Site settings > Environment variables
+5. Restart the dev server
 
 > **Note**: The app works beautifully without an API key too! Pets will use built-in personality responses instead of Claude AI.
 

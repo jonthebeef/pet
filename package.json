@@ -8,8 +8,13 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.56.0",
+    "@netlify/plugin-nextjs": "^5.11.4",
     "@types/node": "^24.0.10",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
