@@ -126,18 +126,21 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpd
           onPetUpdate(updatedPet);
           
           // Show visual feedback for stat changes
-          const hasPositiveChanges = Object.values(data.statChanges).some((change: any) => 
-            (typeof change === 'number' && change > pet.stats[Object.keys(data.statChanges)[Object.values(data.statChanges).indexOf(change)] as keyof typeof pet.stats])
-          );
-          const hasNegativeChanges = Object.values(data.statChanges).some((change: any) => 
-            (typeof change === 'number' && change < pet.stats[Object.keys(data.statChanges)[Object.values(data.statChanges).indexOf(change)] as keyof typeof pet.stats])
-          );
+          // Check if happiness, health, or energy increased (positive changes)
+          const happinessUp = data.statChanges.happiness && data.statChanges.happiness > pet.stats.happiness;
+          const healthUp = data.statChanges.health && data.statChanges.health > pet.stats.health;
+          const energyUp = data.statChanges.energy && data.statChanges.energy > pet.stats.energy;
           
-          if (hasPositiveChanges) {
+          // Check if happiness, health, or energy decreased (negative changes)
+          const happinessDown = data.statChanges.happiness && data.statChanges.happiness < pet.stats.happiness;
+          const healthDown = data.statChanges.health && data.statChanges.health < pet.stats.health;
+          const energyDown = data.statChanges.energy && data.statChanges.energy < pet.stats.energy;
+          
+          if (happinessUp || healthUp || energyUp) {
             setTimeout(() => {
               addMessage('pet', '✨ *feels happier and healthier* ✨');
             }, 1500);
-          } else if (hasNegativeChanges) {
+          } else if (happinessDown || healthDown || energyDown) {
             setTimeout(() => {
               addMessage('pet', '💔 *feels hurt and stressed* 💔');
             }, 1500);
