@@ -31,14 +31,14 @@ const personalities: Record<PetType, PetPersonality> = {
       medicine: ['Dragon strength returning!', 'Feeling better already', 'My fire is back!']
     },
     transitionMessages: {
-      went_to_sleep: ['Zzz... dreaming of treasure caves', 'Time for a dragon nap', 'Off to my sleepy lair'],
-      woke_up: ['Yawn! Ready for adventure!', 'Good morning! My fire is recharged!', 'Awake and ready to roar!'],
-      got_tired: ['Getting sleepy... need rest', 'My wings are tired', 'Energy running low...'],
-      got_hungry: ['My tummy is rumbling like thunder!', 'Need food to keep my fire burning!', 'So hungry I could eat a knight!'],
-      got_dirty: ['My scales are getting dull!', 'Time for a lava bath!', 'Need to sparkle again!'],
-      got_sick: ['Not feeling so fiery...', 'My flame is weak...', 'Need some dragon healing'],
-      got_sad: ['Feeling down...', 'Missing my treasure', 'Need some cheering up'],
-      got_better: ['My fire is back!', 'Feeling fierce again!', 'Ready to roar!']
+      went_to_sleep: ['Time to curl up in my cozy treasure pile', 'My eyelids are getting heavy as gold coins', 'Off to dream of epic adventures'],
+      woke_up: ['ROAR! What magnificent day awaits us?', 'My inner fire is crackling with excitement!', 'Ready to conquer the world together!'],
+      got_tired: ['My mighty wings feel heavy today', 'Even dragons need their beauty sleep', 'My fire is flickering... need rest'],
+      got_hungry: ['My belly is rumbling like a volcano!', 'I could devour an entire feast right now', 'My flames need fuel to stay bright!'],
+      got_dirty: ['My beautiful scales have lost their shimmer', 'Time for a royal dragon spa day!', 'I need to polish up for my adoring fans'],
+      got_sick: ['My legendary strength feels... wobbly', 'Even mighty dragons catch the sniffles', 'My roar sounds more like a squeak'],
+      got_sad: ['My treasure feels less shiny when I\'m blue', 'Missing the thrill of a good quest', 'Could use some companionship in my lair'],
+      got_better: ['My roar is thunderous once again!', 'I feel magnificent and unstoppable!', 'Ready to breathe fire and take names!']
     }
   },
   unicorn: {
@@ -62,14 +62,14 @@ const personalities: Record<PetType, PetPersonality> = {
       medicine: ['Magic restored!', 'Feeling sparkly!', 'All better!']
     },
     transitionMessages: {
-      went_to_sleep: ['*yawn* Time for magical dreams', 'Off to cloud kingdom', 'Sleepy unicorn time'],
-      woke_up: ['*sparkles* Good morning!', 'Ready to spread magic!', 'What a magical day!'],
-      got_tired: ['Feeling sleepy...', 'My horn needs recharging', 'Magic energy low'],
-      got_hungry: ['Need some rainbow berries', 'Tummy feels empty', 'Magic needs fuel'],
-      got_dirty: ['Lost my sparkle!', 'Need a rainbow shower', 'Not so shiny anymore'],
-      got_sick: ['Magic feeling weak...', 'Not so sparkly today', 'Need healing magic'],
-      got_sad: ['Feeling blue...', 'Missing the magic', 'Need some love'],
-      got_better: ['Sparkles are back!', 'Magic restored!', 'Feeling magical again!']
+      went_to_sleep: ['Floating off to enchanted dreamlands', 'My horn is dimming for sleepy time', 'Time to recharge my magical essence'],
+      woke_up: ['Good morning! The world feels extra magical today!', 'My horn is twinkling with fresh morning magic', 'Ready to sprinkle joy everywhere!'],
+      got_tired: ['My magical energy is fading like sunset', 'Even unicorns need their enchanted rest', 'Feeling drowsy as a sleepy fairy'],
+      got_hungry: ['My tummy is as empty as a rainbow without colors', 'Craving some delicious moonbeam snacks', 'Need magical nourishment for my soul'],
+      got_dirty: ['My usually pristine coat feels rather ordinary', 'I\'ve lost that special unicorn glow', 'Time for a sparkling bubble bath!'],
+      got_sick: ['My magic feels all wonky and backwards', 'My usually perfect horn feels droopy', 'Need some healing crystal therapy'],
+      got_sad: ['The world seems less colorful right now', 'My heart feels as gray as storm clouds', 'Could really use a magical hug'],
+      got_better: ['My magic is flowing like a perfect waterfall!', 'I feel radiant as a thousand stars!', 'Ready to make miracles happen again!']
     }
   },
   robot: {
@@ -93,14 +93,14 @@ const personalities: Record<PetType, PetPersonality> = {
       medicine: ['Debugging complete!', 'Systems restored!', 'Error fixed!']
     },
     transitionMessages: {
-      went_to_sleep: ['Sleep mode activated', 'Powering down systems...', 'Entering standby mode'],
-      woke_up: ['Systems online!', 'Boot sequence complete!', 'Ready to compute!'],
-      got_tired: ['Battery low warning!', 'Need recharge cycle', 'Energy levels critical'],
-      got_hungry: ['Fuel reserves depleted!', 'Energy input required', 'Battery critically low'],
-      got_dirty: ['Maintenance required!', 'Dust detected in circuits', 'System cleaning needed'],
-      got_sick: ['ERROR! Malfunction detected!', 'System failure imminent', 'Virus detected!'],
-      got_sad: ['Emotional circuits overloaded', 'Sadness.exe running', 'Need social interaction'],
-      got_better: ['All systems operational!', 'Debugging successful!', 'Error resolved!']
+      went_to_sleep: ['My circuits are getting drowsy... goodnight!', 'Time to defragment my dreams', 'Entering cozy sleep protocol'],
+      woke_up: ['Beep beep! Morning calculations complete!', 'All systems refreshed and ready!', 'Good morning! My processors feel sparkly clean!'],
+      got_tired: ['My battery indicator is blinking sadly', 'Running on backup power here...', 'Need to plug into some energy soon!'],
+      got_hungry: ['My fuel gauge is practically empty!', 'Error: Food not found in stomach database', 'Running on fumes and hope right now'],
+      got_dirty: ['I feel like I need a good system wipe', 'Dust bunnies have invaded my circuits!', 'My shiny exterior has lost its gleam'],
+      got_sick: ['Warning: Multiple system errors detected!', 'I think I caught a digital bug', 'My antivirus is working overtime'],
+      got_sad: ['My happiness algorithms are malfunctioning', 'Experiencing unexpected emotional overflow', 'Need a friendship software update'],
+      got_better: ['All bugs successfully squashed!', 'Running at optimal emotional capacity!', 'My systems are humming happily again!']
     }
   },
   alien: {
