@@ -19,6 +19,7 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpd
   const [isTyping, setIsTyping] = useState(false);
   const [lastNeed, setLastNeed] = useState<string | null>(null);
   const [prevPet, setPrevPet] = useState<Pet>(pet);
+  const [recentTransitions, setRecentTransitions] = useState<Set<string>>(new Set());
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
   
   const scrollToBottom = () => {
@@ -46,8 +47,32 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpd
     // Check for state transitions
     const transitions = getStateTransitions(prevPet, pet);
     transitions.forEach(transition => {
+      // Prevent duplicate transition messages within 10 seconds
+      const transitionKey = `${transition}-${Date.now()}`;
+      const recentKey = Array.from(recentTransitions).find(key => key.startsWith(transition + '-'));
+      
+      if (recentKey) {
+        const lastTime = parseInt(recentKey.split('-')[1]);
+        if (Date.now() - lastTime < 10000) { // 10 second cooldown
+          return; // Skip this transition message
+        }
+      }
+      
       const message = getTransitionMessage(pet, transition);
       if (message) {
+        // Add to recent transitions
+        setRecentTransitions(prev => {
+          const newSet = new Set(prev);
+          // Remove old entries for this transition type
+          Array.from(newSet).forEach(key => {
+            if (key.startsWith(transition + '-')) {
+              newSet.delete(key);
+            }
+          });
+          newSet.add(transitionKey);
+          return newSet;
+        });
+        
         setTimeout(() => {
           addMessage('pet', message);
         }, Math.random() * 1000 + 500); // Random delay between 0.5-1.5s
@@ -65,7 +90,7 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpd
     }
     
     setPrevPet(pet);
-  }, [pet, prevPet, lastNeed]);
+  }, [pet, prevPet, lastNeed, recentTransitions]);
   
   // Handle interaction responses
   useEffect(() => {
