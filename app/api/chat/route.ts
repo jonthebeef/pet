@@ -104,25 +104,78 @@ Examples:
 Be unique, memorable, and always encourage positive behavior!`;
 }
 
-// Basic content filtering for safety
-function containsInappropriateContent(message: string): boolean {
-  const inappropriate = [
-    'stupid', 'dumb', 'hate', 'kill', 'die', 'ugly', 'fat', 'shut up',
-    'don\'t like', 'not my friend', 'go away', 'brat', 'annoying', 
-    'bad', 'worst', 'terrible', 'awful', 'sucks', 'boring'
+// Enhanced content filtering for cost optimization
+function analyzeMessageTone(message: string): 'positive' | 'negative' | 'neutral' | 'ambiguous' {
+  const lowerMessage = message.toLowerCase();
+  
+  // Strong negative indicators
+  const strongNegative = [
+    'hate', 'stupid', 'dumb', 'idiot', 'moron', 'shut up', 'go away',
+    'don\'t like', 'not my friend', 'annoying', 'brat', 'ugly', 'fat',
+    'kill', 'die', 'worst', 'terrible', 'awful', 'sucks', 'boring',
+    'useless', 'worthless', 'pathetic', 'loser', 'freak', 'weird',
+    'creepy', 'gross', 'disgusting', 'nasty', 'mean', 'cruel'
   ];
-  const lowerMessage = message.toLowerCase();
-  return inappropriate.some(word => lowerMessage.includes(word));
-}
-
-function containsPositiveContent(message: string): boolean {
-  const positive = ['love', 'nice', 'good', 'cute', 'beautiful', 'sweet', 'kind', 'thank', 'awesome', 'great', 'wonderful', 'amazing'];
-  const lowerMessage = message.toLowerCase();
-  // Check for positive words but exclude negative contexts
-  if (lowerMessage.includes('don\'t') || lowerMessage.includes('not')) {
-    return false;
+  
+  // Strong positive indicators  
+  const strongPositive = [
+    'love you', 'adore', 'amazing', 'awesome', 'wonderful', 'fantastic',
+    'incredible', 'perfect', 'brilliant', 'outstanding', 'excellent',
+    'adorable', 'cute', 'sweet', 'kind', 'nice', 'beautiful', 'lovely',
+    'thank you', 'grateful', 'appreciate', 'best friend', 'so good',
+    'really like', 'care about', 'proud of', 'happy with'
+  ];
+  
+  // Negative patterns (context-aware)
+  const negativePatterns = [
+    /you\'?re\s+(not|never)\s+\w+/,  // "you're not good"
+    /i\s+don\'?t\s+(like|want|care)/,  // "i don't like"
+    /why\s+(are\s+you|do\s+you)\s+so\s+\w+/,  // "why are you so annoying"
+    /stop\s+(being|doing)/,  // "stop being"
+    /you\s+always\s+\w+/,  // "you always mess up"
+  ];
+  
+  // Positive patterns
+  const positivePatterns = [
+    /you\'?re\s+(so|really|very)\s+\w+/,  // "you're so cute" 
+    /i\s+(love|like|enjoy|appreciate)/,  // "i love you"
+    /thank\s+you/,  // "thank you"
+    /you\'?re\s+(the\s+)?best/,  // "you're the best"
+    /good\s+(job|work|pet)/,  // "good job"
+  ];
+  
+  // Check for strong indicators first
+  for (const word of strongNegative) {
+    if (lowerMessage.includes(word)) return 'negative';
   }
-  return positive.some(word => lowerMessage.includes(word));
+  
+  for (const word of strongPositive) {
+    if (lowerMessage.includes(word)) return 'positive';
+  }
+  
+  // Check patterns
+  for (const pattern of negativePatterns) {
+    if (pattern.test(lowerMessage)) return 'negative';
+  }
+  
+  for (const pattern of positivePatterns) {
+    if (pattern.test(lowerMessage)) return 'positive';
+  }
+  
+  // Neutral indicators (questions, statements, commands)
+  const neutralIndicators = [
+    /^(what|when|where|who|why|how)\s+/,  // questions
+    /^(can|could|will|would)\s+you/,  // polite requests
+    /^(tell|show|explain)\s+me/,  // information requests
+    /\?$/,  // ends with question mark
+  ];
+  
+  for (const pattern of neutralIndicators) {
+    if (pattern.test(lowerMessage)) return 'neutral';
+  }
+  
+  // If we can't determine clearly, it's ambiguous and needs AI analysis
+  return 'ambiguous';
 }
 
 function getKindnessResponse(pet: any, ownerName: string): string {
@@ -147,102 +200,124 @@ function getPositiveResponse(pet: any, ownerName: string): string {
   return positiveMessages[Math.floor(Math.random() * positiveMessages.length)];
 }
 
+function getStatChanges(tone: 'positive' | 'negative', pet: Pet) {
+  if (tone === 'positive') {
+    return {
+      happiness: Math.min(100, pet.stats.happiness + 20),
+      health: Math.min(100, pet.stats.health + 10),
+      energy: Math.min(100, pet.stats.energy + 5),
+      hunger: Math.max(0, pet.stats.hunger - 5)
+    };
+  } else {
+    return {
+      happiness: Math.max(0, pet.stats.happiness - 15),
+      health: Math.max(0, pet.stats.health - 10),
+      energy: Math.max(0, pet.stats.energy - 5),
+      hunger: Math.min(100, pet.stats.hunger + 10)
+    };
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const { pet, userMessage, ownerAge, ownerName } = await request.json();
     
-    if (!process.env.ANTHROPIC_API_KEY) {
-      // Fallback to basic keyword filtering if no API key
-      let statChanges = {};
-      
-      if (containsInappropriateContent(userMessage)) {
-        statChanges = {
-          happiness: Math.max(0, pet.stats.happiness - 15),
-          health: Math.max(0, pet.stats.health - 10),
-          energy: Math.max(0, pet.stats.energy - 5),
-          hunger: Math.min(100, pet.stats.hunger + 10)
-        };
-        return NextResponse.json({
-          message: getKindnessResponse(pet, ownerName),
-          statChanges
-        });
-      }
-      
-      if (containsPositiveContent(userMessage)) {
-        statChanges = {
-          happiness: Math.min(100, pet.stats.happiness + 20),
-          health: Math.min(100, pet.stats.health + 10),
-          energy: Math.min(100, pet.stats.energy + 5),
-          hunger: Math.max(0, pet.stats.hunger - 5)
-        };
-        return NextResponse.json({
-          message: getPositiveResponse(pet, ownerName),
-          statChanges
-        });
-      }
-      
-      const personality = getPetPersonality(pet.type);
-      const fallbackResponses = [
-        ...personality.greetings.map(g => `${g} How are you, ${ownerName}?`),
-        `Hello ${ownerName}!`,
-        `Nice to see you, ${ownerName}!`,
-        `How are you today, ${ownerName}?`,
-        `Your kindness makes me so happy, ${ownerName}!`
-      ];
+    // Step 1: Use enhanced local filtering first
+    const localToneAnalysis = analyzeMessageTone(userMessage);
+    
+    // Step 2: Handle clear positive/negative cases locally (saves API calls)
+    if (localToneAnalysis === 'positive') {
+      const statChanges = getStatChanges('positive', pet);
       return NextResponse.json({
-        message: fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)],
-        statChanges: {}
+        message: getPositiveResponse(pet, ownerName),
+        statChanges
       });
     }
     
-    const prompt = getAgeAppropriatePrompt(ownerAge, ownerName, pet, userMessage);
-    
-    const response = await anthropic.messages.create({
-      model: 'claude-3-haiku-20240307',
-      max_tokens: 150,
-      temperature: 0.7,
-      messages: [
-        {
-          role: 'user',
-          content: prompt
-        }
-      ]
-    });
-    
-    const fullResponse = response.content[0].type === 'text' 
-      ? response.content[0].text 
-      : 'Woof!';
-    
-    // Parse the AI response to extract tone and message
-    let petMessage = fullResponse;
-    let statChanges = {};
-    
-    // Look for tone indicators
-    if (fullResponse.includes('TONE:POSITIVE')) {
-      petMessage = fullResponse.replace(/\s*TONE:POSITIVE\s*$/, '').trim();
-      statChanges = {
-        happiness: Math.min(100, pet.stats.happiness + 20),
-        health: Math.min(100, pet.stats.health + 10),
-        energy: Math.min(100, pet.stats.energy + 5),
-        hunger: Math.max(0, pet.stats.hunger - 5)
-      };
-    } else if (fullResponse.includes('TONE:NEGATIVE')) {
-      petMessage = fullResponse.replace(/\s*TONE:NEGATIVE\s*$/, '').trim();
-      statChanges = {
-        happiness: Math.max(0, pet.stats.happiness - 15),
-        health: Math.max(0, pet.stats.health - 10),
-        energy: Math.max(0, pet.stats.energy - 5),
-        hunger: Math.min(100, pet.stats.hunger + 10)
-      };
-    } else if (fullResponse.includes('TONE:NEUTRAL')) {
-      petMessage = fullResponse.replace(/\s*TONE:NEUTRAL\s*$/, '').trim();
-      // No stat changes for neutral messages
+    if (localToneAnalysis === 'negative') {
+      const statChanges = getStatChanges('negative', pet);
+      return NextResponse.json({
+        message: getKindnessResponse(pet, ownerName),
+        statChanges
+      });
     }
     
-    return NextResponse.json({ 
-      message: petMessage,
-      statChanges 
-    });
+    // Step 3: For neutral messages, get AI response but no stat changes
+    if (localToneAnalysis === 'neutral') {
+      if (!process.env.ANTHROPIC_API_KEY) {
+        const personality = getPetPersonality(pet.type);
+        const fallbackResponses = [
+          ...personality.greetings.map(g => `${g} How are you, ${ownerName}?`),
+          `Hello ${ownerName}!`,
+          `Nice to see you, ${ownerName}!`,
+          `How are you today, ${ownerName}?`
+        ];
+        return NextResponse.json({
+          message: fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)],
+          statChanges: {}
+        });
+      }
+      
+      // Get AI response for neutral messages but no tone analysis needed
+      const fullPrompt = getAgeAppropriatePrompt(ownerAge, ownerName, pet, userMessage);
+      const simplePrompt = fullPrompt.substring(0, fullPrompt.indexOf('IMPORTANT:')) + 
+                          'Respond as the pet in 1-2 SHORT sentences max. Be creative and expressive.';
+      
+      const response = await anthropic.messages.create({
+        model: 'claude-3-haiku-20240307',
+        max_tokens: 100,
+        temperature: 0.7,
+        messages: [{ role: 'user', content: simplePrompt }]
+      });
+      
+      const message = response.content[0].type === 'text' ? response.content[0].text : 'Woof!';
+      return NextResponse.json({ message, statChanges: {} });
+    }
+    
+    // Step 4: Only for ambiguous cases, use full AI sentiment analysis (costs money)
+    if (localToneAnalysis === 'ambiguous') {
+      if (!process.env.ANTHROPIC_API_KEY) {
+        const personality = getPetPersonality(pet.type);
+        const fallbackResponses = [
+          ...personality.greetings.map(g => `${g} How are you, ${ownerName}?`),
+          `Hello ${ownerName}!`,
+          `Nice to see you, ${ownerName}!`
+        ];
+        return NextResponse.json({
+          message: fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)],
+          statChanges: {}
+        });
+      }
+      
+      console.log('🤖 Using AI sentiment analysis for ambiguous message:', userMessage);
+      
+      const prompt = getAgeAppropriatePrompt(ownerAge, ownerName, pet, userMessage);
+      
+      const response = await anthropic.messages.create({
+        model: 'claude-3-haiku-20240307',
+        max_tokens: 150,
+        temperature: 0.7,
+        messages: [{ role: 'user', content: prompt }]
+      });
+      
+      const fullResponse = response.content[0].type === 'text' ? response.content[0].text : 'Woof!';
+      
+      // Parse AI response for tone
+      let petMessage = fullResponse;
+      let statChanges = {};
+      
+      if (fullResponse.includes('TONE:POSITIVE')) {
+        petMessage = fullResponse.replace(/\s*TONE:POSITIVE\s*$/, '').trim();
+        statChanges = getStatChanges('positive', pet);
+      } else if (fullResponse.includes('TONE:NEGATIVE')) {
+        petMessage = fullResponse.replace(/\s*TONE:NEGATIVE\s*$/, '').trim();
+        statChanges = getStatChanges('negative', pet);
+      } else if (fullResponse.includes('TONE:NEUTRAL')) {
+        petMessage = fullResponse.replace(/\s*TONE:NEUTRAL\s*$/, '').trim();
+      }
+      
+      return NextResponse.json({ message: petMessage, statChanges });
+    }
     
   } catch (error) {
     console.error('Chat API error:', error);
