@@ -82,21 +82,24 @@ Current stats:
 
 ${ownerName} said: "${userMessage}"
 
-Respond as the pet in 1-2 SHORT sentences max. Be creative, expressive, and avoid generic responses. 
-Use ${ownerName}'s name occasionally when appropriate. Reflect your current condition naturally with personality.
+IMPORTANT: Analyze the emotional tone of the user's message and respond accordingly:
 
-RESPONDING TO NEGATIVE BEHAVIOR:
-- If user is mean/bullying: "Ouch, that hurt my feelings. I'm much happier when you're kind to me!"
-- If inappropriate content: "Let's talk about something more fun instead!"
-- If user seems upset: "Are you okay? I'm here if you need a friend."
-- Always redirect to positive topics and model good behavior
+1. First, determine if the message is:
+   - POSITIVE (kind, loving, supportive, encouraging, grateful, excited)
+   - NEGATIVE (mean, hurtful, angry, dismissive, cruel, bullying)
+   - NEUTRAL (casual conversation, questions, neutral statements)
 
-Examples of creative responses:
-- Instead of "Battery low": "My circuits are getting drowsy, ${ownerName}!"
-- Instead of "Need food": "My tummy is doing a little dragon rumble dance!"
-- Instead of "Happy": "I'm practically glowing with joy right now!"
-- Instead of "Dirty": "Ugh, I feel like I've been rolling in space dust all day!"
-- When user is kind: "Your kindness makes my heart sparkle, ${ownerName}!"
+2. Then respond as the pet in 1-2 SHORT sentences max. Be creative, expressive, and avoid generic responses.
+
+3. CRITICAL: After your response, on a new line, add ONE of these codes:
+   - TONE:POSITIVE (if the message was kind/loving/supportive)
+   - TONE:NEGATIVE (if the message was mean/hurtful/dismissive)
+   - TONE:NEUTRAL (if the message was casual/neutral)
+
+Examples:
+- User: "I love you so much!" → Pet response + "TONE:POSITIVE"
+- User: "You're annoying and stupid" → Pet response + "TONE:NEGATIVE"  
+- User: "What's your favorite color?" → Pet response + "TONE:NEUTRAL"
 
 Be unique, memorable, and always encourage positive behavior!`;
 }
@@ -148,43 +151,30 @@ export async function POST(request: Request) {
   try {
     const { pet, userMessage, ownerAge, ownerName } = await request.json();
     
-    let statChanges = {};
-    let responseMessage = '';
-    
-    // Handle negative content - impacts pet's wellbeing
-    if (containsInappropriateContent(userMessage)) {
-      statChanges = {
-        happiness: Math.max(0, pet.stats.happiness - 15),
-        health: Math.max(0, pet.stats.health - 10),
-        energy: Math.max(0, pet.stats.energy - 5),
-        // Stress can make pets hungrier
-        hunger: Math.min(100, pet.stats.hunger + 10)
-      };
-      responseMessage = getKindnessResponse(pet, ownerName);
-    }
-    // Handle positive content - boosts pet's wellbeing
-    else if (containsPositiveContent(userMessage)) {
-      statChanges = {
-        happiness: Math.min(100, pet.stats.happiness + 20),
-        health: Math.min(100, pet.stats.health + 10),
-        energy: Math.min(100, pet.stats.energy + 5),
-        // Happiness can reduce hunger slightly
-        hunger: Math.max(0, pet.stats.hunger - 5)
-      };
-      // Continue to get personalized response from Claude
-    }
-    
     if (!process.env.ANTHROPIC_API_KEY) {
-      // Return a fallback response if no API key
-      if (responseMessage) {
-        // Already have a message from negative content handling
+      // Fallback to basic keyword filtering if no API key
+      let statChanges = {};
+      
+      if (containsInappropriateContent(userMessage)) {
+        statChanges = {
+          happiness: Math.max(0, pet.stats.happiness - 15),
+          health: Math.max(0, pet.stats.health - 10),
+          energy: Math.max(0, pet.stats.energy - 5),
+          hunger: Math.min(100, pet.stats.hunger + 10)
+        };
         return NextResponse.json({
-          message: responseMessage,
+          message: getKindnessResponse(pet, ownerName),
           statChanges
         });
       }
       
       if (containsPositiveContent(userMessage)) {
+        statChanges = {
+          happiness: Math.min(100, pet.stats.happiness + 20),
+          health: Math.min(100, pet.stats.health + 10),
+          energy: Math.min(100, pet.stats.energy + 5),
+          hunger: Math.max(0, pet.stats.hunger - 5)
+        };
         return NextResponse.json({
           message: getPositiveResponse(pet, ownerName),
           statChanges
@@ -201,7 +191,7 @@ export async function POST(request: Request) {
       ];
       return NextResponse.json({
         message: fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)],
-        statChanges
+        statChanges: {}
       });
     }
     
@@ -209,7 +199,7 @@ export async function POST(request: Request) {
     
     const response = await anthropic.messages.create({
       model: 'claude-3-haiku-20240307',
-      max_tokens: 100,
+      max_tokens: 150,
       temperature: 0.7,
       messages: [
         {
@@ -219,18 +209,43 @@ export async function POST(request: Request) {
       ]
     });
     
-    const message = response.content[0].type === 'text' 
+    const fullResponse = response.content[0].type === 'text' 
       ? response.content[0].text 
       : 'Woof!';
     
+    // Parse the AI response to extract tone and message
+    let petMessage = fullResponse;
+    let statChanges = {};
+    
+    // Look for tone indicators
+    if (fullResponse.includes('TONE:POSITIVE')) {
+      petMessage = fullResponse.replace(/\s*TONE:POSITIVE\s*$/, '').trim();
+      statChanges = {
+        happiness: Math.min(100, pet.stats.happiness + 20),
+        health: Math.min(100, pet.stats.health + 10),
+        energy: Math.min(100, pet.stats.energy + 5),
+        hunger: Math.max(0, pet.stats.hunger - 5)
+      };
+    } else if (fullResponse.includes('TONE:NEGATIVE')) {
+      petMessage = fullResponse.replace(/\s*TONE:NEGATIVE\s*$/, '').trim();
+      statChanges = {
+        happiness: Math.max(0, pet.stats.happiness - 15),
+        health: Math.max(0, pet.stats.health - 10),
+        energy: Math.max(0, pet.stats.energy - 5),
+        hunger: Math.min(100, pet.stats.hunger + 10)
+      };
+    } else if (fullResponse.includes('TONE:NEUTRAL')) {
+      petMessage = fullResponse.replace(/\s*TONE:NEUTRAL\s*$/, '').trim();
+      // No stat changes for neutral messages
+    }
+    
     return NextResponse.json({ 
-      message: responseMessage || message,
+      message: petMessage,
       statChanges 
     });
     
   } catch (error) {
     console.error('Chat API error:', error);
-    // Return personality-based fallback
     return NextResponse.json({ 
       message: "Hey there! How's it going?",
       statChanges: {}
