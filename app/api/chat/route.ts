@@ -192,6 +192,8 @@ function getKindnessResponse(pet: any, ownerName: string): string {
 function getAgeAppropriateQuestions(ownerAge: number): string[] {
   if (ownerAge < 6) {
     return [
+      "How are you feeling today? 🤗",
+      "Are you happy or sad right now? 💙",
       "What's your favorite color? 🌈",
       "Do you like to draw pictures? 🎨",
       "What makes you smile? 😊",
@@ -200,6 +202,8 @@ function getAgeAppropriateQuestions(ownerAge: number): string[] {
     ];
   } else if (ownerAge < 10) {
     return [
+      "How are you feeling today? 😊",
+      "Is everything okay with you? 💭",
       "What was the best part of your day? ✨",
       "If you could have any superpower, what would it be? 🦸",
       "What's your favorite game to play? 🎮",
@@ -209,6 +213,8 @@ function getAgeAppropriateQuestions(ownerAge: number): string[] {
     ];
   } else if (ownerAge < 13) {
     return [
+      "How are you doing today? 🌟",
+      "What's on your mind? 💭",
       "What's something cool you learned recently? 🤔",
       "What kind of music do you like? 🎵",
       "What's your favorite subject in school? 📖",
@@ -218,6 +224,8 @@ function getAgeAppropriateQuestions(ownerAge: number): string[] {
     ];
   } else if (ownerAge < 18) {
     return [
+      "How are you really doing? 💫",
+      "What's been on your mind lately? 🤔",
       "What's inspiring you lately? 💫",
       "What's a goal you're working toward? 🎯",
       "What's the most interesting thing you've discovered recently? 🔍",
@@ -227,6 +235,8 @@ function getAgeAppropriateQuestions(ownerAge: number): string[] {
     ];
   } else {
     return [
+      "How are you doing today, really? 🌸",
+      "How's your mental space today? 🧘",
       "What's bringing you joy these days? ☀️",
       "What's something you're looking forward to? 🌟",
       "What's a small win you've had recently? 🏆",
