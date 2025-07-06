@@ -20,6 +20,7 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpd
   const [lastNeed, setLastNeed] = useState<string | null>(null);
   const [prevPet, setPrevPet] = useState<Pet>(pet);
   const [recentTransitions, setRecentTransitions] = useState<Set<string>>(new Set());
+  const [lastNeedMessageTime, setLastNeedMessageTime] = useState<number>(0);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   
@@ -44,7 +45,7 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpd
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
   
-  // Initial greeting
+  // Initial greeting and focus
   useEffect(() => {
     const baseGreeting = getPetMessage(pet, null, 'greeting');
     const personalizedGreeting = `${baseGreeting} Nice to meet you, ${ownerName}!`;
@@ -54,6 +55,11 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpd
       message: personalizedGreeting,
       timestamp: new Date()
     }]);
+    
+    // Auto-focus input on load
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 100);
   }, [pet.type, ownerName]);
   
   // Check for state transitions and needs
@@ -67,7 +73,7 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpd
       
       if (recentKey) {
         const lastTime = parseInt(recentKey.split('-')[1]);
-        if (Date.now() - lastTime < 10000) { // 10 second cooldown
+        if (Date.now() - lastTime < 30000) { // 30 second cooldown to reduce spam
           return; // Skip this transition message
         }
       }
@@ -93,10 +99,15 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpd
       }
     });
     
-    // Check for ongoing needs
+    // Check for ongoing needs (with cooldown to reduce spam)
     const need = getPetNeed(pet);
-    if (need && need !== lastNeed) {
+    const now = Date.now();
+    const timeSinceLastNeed = now - lastNeedMessageTime;
+    
+    // Only send need messages if it's a new need and enough time has passed (30 seconds)
+    if (need && need !== lastNeed && timeSinceLastNeed > 30000) {
       setLastNeed(need);
+      setLastNeedMessageTime(now);
       const message = getPetMessage(pet, need);
       setTimeout(() => {
         addMessage('pet', message);
@@ -104,26 +115,36 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpd
     }
     
     setPrevPet(pet);
-  }, [pet, prevPet, lastNeed, recentTransitions]);
+  }, [pet, prevPet, lastNeed, recentTransitions, lastNeedMessageTime]);
   
-  // Handle interaction responses
-  useEffect(() => {
-    if (pet.state === 'eating' || pet.state === 'playing') {
-      const response = getInteractionResponse(pet, pet.state === 'eating' ? 'feed' : 'play');
-      // Use a timeout to avoid state updates during render
-      setTimeout(() => {
-        addMessage('pet', response);
-      }, 100);
-    }
-  }, [pet.state]);
+  // Handle interaction responses - DISABLED to reduce chat spam
+  // useEffect(() => {
+  //   if (pet.state === 'eating' || pet.state === 'playing') {
+  //     const response = getInteractionResponse(pet, pet.state === 'eating' ? 'feed' : 'play');
+  //     // Use a timeout to avoid state updates during render
+  //     setTimeout(() => {
+  //       addMessage('pet', response);
+  //     }, 100);
+  //   }
+  // }, [pet.state]);
   
   const addMessage = (sender: 'pet' | 'user', message: string) => {
+    // Remember if input was focused before adding message
+    const wasInputFocused = document.activeElement === inputRef.current;
+    
     setMessages(prev => [...prev, {
       id: Date.now().toString(),
       sender,
       message,
       timestamp: new Date()
     }]);
+    
+    // Restore focus if it was on input
+    if (wasInputFocused && sender === 'pet') {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 50);
+    }
   };
   
   const sendMessage = async () => {
@@ -132,6 +153,11 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpd
     const userMessage = inputValue;
     setInputValue('');
     addMessage('user', userMessage);
+    
+    // Keep focus on input after sending
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 100);
     
     setIsTyping(true);
     
