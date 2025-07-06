@@ -6,6 +6,7 @@ interface PetPersonality {
   greetings: string[];
   needMessages: Record<PetNeed, string[]>;
   interactionResponses: Record<string, string[]>;
+  transitionMessages: Record<string, string[]>;
 }
 
 const personalities: Record<PetType, PetPersonality> = {
@@ -29,6 +30,16 @@ const personalities: Record<PetType, PetPersonality> = {
       sleep: ['Time to dream of gold...', 'Nighty night!', 'Sweet dragon dreams'],
       clean: ['Shiny scales again!', 'Looking magnificent!', 'All sparkly now!'],
       medicine: ['Dragon strength returning!', 'Feeling better already', 'My fire is back!']
+    },
+    transitionMessages: {
+      went_to_sleep: ['Zzz... dreaming of treasure caves', 'Time for a dragon nap', 'Off to my sleepy lair'],
+      woke_up: ['Yawn! Ready for adventure!', 'Good morning! My fire is recharged!', 'Awake and ready to roar!'],
+      got_tired: ['Getting sleepy... need rest', 'My wings are tired', 'Energy running low...'],
+      got_hungry: ['My tummy is rumbling like thunder!', 'Need food to keep my fire burning!', 'So hungry I could eat a knight!'],
+      got_dirty: ['My scales are getting dull!', 'Time for a lava bath!', 'Need to sparkle again!'],
+      got_sick: ['Not feeling so fiery...', 'My flame is weak...', 'Need some dragon healing'],
+      got_sad: ['Feeling down...', 'Missing my treasure', 'Need some cheering up'],
+      got_better: ['My fire is back!', 'Feeling fierce again!', 'Ready to roar!']
     }
   },
   unicorn: {
@@ -51,6 +62,16 @@ const personalities: Record<PetType, PetPersonality> = {
       sleep: ['Sweet dreams...', 'Off to dreamland', 'Magical rest'],
       clean: ['So shiny!', 'Sparkles restored!', 'Beautiful again!'],
       medicine: ['Magic restored!', 'Feeling sparkly!', 'All better!']
+    },
+    transitionMessages: {
+      went_to_sleep: ['*yawn* Time for magical dreams', 'Off to cloud kingdom', 'Sleepy unicorn time'],
+      woke_up: ['*sparkles* Good morning!', 'Ready to spread magic!', 'What a magical day!'],
+      got_tired: ['Feeling sleepy...', 'My horn needs recharging', 'Magic energy low'],
+      got_hungry: ['Need some rainbow berries', 'Tummy feels empty', 'Magic needs fuel'],
+      got_dirty: ['Lost my sparkle!', 'Need a rainbow shower', 'Not so shiny anymore'],
+      got_sick: ['Magic feeling weak...', 'Not so sparkly today', 'Need healing magic'],
+      got_sad: ['Feeling blue...', 'Missing the magic', 'Need some love'],
+      got_better: ['Sparkles are back!', 'Magic restored!', 'Feeling magical again!']
     }
   },
   robot: {
@@ -73,6 +94,16 @@ const personalities: Record<PetType, PetPersonality> = {
       sleep: ['Sleep mode engaging...', 'Powering down...', 'Rest cycle started'],
       clean: ['Maintenance complete!', 'Shiny circuits!', 'All clean!'],
       medicine: ['Debugging complete!', 'Systems restored!', 'Error fixed!']
+    },
+    transitionMessages: {
+      went_to_sleep: ['Sleep mode activated', 'Powering down systems...', 'Entering standby mode'],
+      woke_up: ['Systems online!', 'Boot sequence complete!', 'Ready to compute!'],
+      got_tired: ['Battery low warning!', 'Need recharge cycle', 'Energy levels critical'],
+      got_hungry: ['Fuel reserves depleted!', 'Energy input required', 'Battery critically low'],
+      got_dirty: ['Maintenance required!', 'Dust detected in circuits', 'System cleaning needed'],
+      got_sick: ['ERROR! Malfunction detected!', 'System failure imminent', 'Virus detected!'],
+      got_sad: ['Emotional circuits overloaded', 'Sadness.exe running', 'Need social interaction'],
+      got_better: ['All systems operational!', 'Debugging successful!', 'Error resolved!']
     }
   },
   alien: {
@@ -95,6 +126,16 @@ const personalities: Record<PetType, PetPersonality> = {
       sleep: ['Time for space dreams', 'Zzz...', 'Sleeping like on Mars'],
       clean: ['All clean now!', 'No more space dust!', 'Sparkly alien!'],
       medicine: ['Feeling better!', 'Earth medicine works!', 'All good now!']
+    },
+    transitionMessages: {
+      went_to_sleep: ['Zzz... dreaming of home planet', 'Space nap time!', 'Off to galaxy dreams'],
+      woke_up: ['Bloop bleep! Good morning Earth!', 'Ready to explore!', 'What earth fun today?'],
+      got_tired: ['Space travel is exhausting', 'Need alien power nap', 'Energy pods depleted'],
+      got_hungry: ['Need earth snacks!', 'Alien tummy rumbling!', 'Hungry for earth food!'],
+      got_dirty: ['Space dust everywhere!', 'Need cosmic shower!', 'Getting grimy on Earth'],
+      got_sick: ['Not used to Earth germs!', 'Alien immune system struggling', 'Need space medicine'],
+      got_sad: ['Missing home planet...', 'Feeling alien-ated', 'Need earth friend hug'],
+      got_better: ['Earth immunity activated!', 'Feeling cosmic again!', 'Ready to explore!']
     }
   },
   dino: {
@@ -117,6 +158,16 @@ const personalities: Record<PetType, PetPersonality> = {
       sleep: ['Dino dreams...', 'Sleepy time', 'Zzz...'],
       clean: ['Clean dino!', 'All fresh now!', 'Sparkly scales!'],
       medicine: ['Feeling stronger!', 'Dino power back!', 'All better!']
+    },
+    transitionMessages: {
+      went_to_sleep: ['YAWN! Big dino sleepy', 'Time for prehistoric dreams', 'Dino bedtime!'],
+      woke_up: ['ROAR! Good morning!', 'Dino ready to stomp!', 'What a dino-rific day!'],
+      got_tired: ['Big dino getting sleepy', 'Need dino nap time', 'Tired from all the stomping'],
+      got_hungry: ['Dino tummy RUMBLING!', 'Need BIG portions!', 'Hungry like T-Rex!'],
+      got_dirty: ['Covered in prehistoric mud!', 'Messy dino alert!', 'Need big dino wash!'],
+      got_sick: ['Dino not feeling mighty...', 'Prehistoric sniffles', 'Need dino medicine'],
+      got_sad: ['Missing other dinos...', 'Lonely dinosaur', 'Need dino hugs'],
+      got_better: ['ROAR! Dino strength back!', 'Mighty dino returns!', 'Ready to stomp again!']
     }
   }
 };
@@ -149,4 +200,15 @@ export function getInteractionResponse(pet: Pet, interaction: string): string {
   }
   
   return 'Thanks!';
+}
+
+export function getTransitionMessage(pet: Pet, transition: string): string {
+  const personality = getPetPersonality(pet.type);
+  const messages = personality.transitionMessages[transition];
+  
+  if (messages && messages.length > 0) {
+    return messages[Math.floor(Math.random() * messages.length)];
+  }
+  
+  return '';
 }

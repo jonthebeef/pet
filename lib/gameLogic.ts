@@ -5,7 +5,7 @@ const STAT_DECAY_RATES = {
   health: 1, // per hour
   hunger: 5, // per hour (increases)
   energy: 3, // per hour
-  cleanliness: 2, // per hour
+  cleanliness: 4, // per hour (increased to get dirty faster)
 };
 
 const LIFESPAN_RANGES = {
@@ -55,7 +55,12 @@ export function updatePetStats(pet: Pet): Pet {
   
   // Health deteriorates faster if other stats are low
   if (newStats.hunger > 80 || newStats.cleanliness < 20) {
-    newStats.health = Math.max(0, newStats.health - 5);
+    newStats.health = Math.max(0, newStats.health - 10);
+  }
+  
+  // Random chance of getting sick
+  if (Math.random() < 0.02 && newStats.health > 30) { // 2% chance per update
+    newStats.health = Math.max(20, newStats.health - 30);
   }
   
   const newAge = pet.age + hoursSinceLastUpdate;
@@ -158,12 +163,33 @@ export function getPetNeed(pet: Pet): PetNeed {
   
   if (pet.state === 'dead') return null;
   if (stats.health < 30) return 'sick';
-  if (stats.hunger > 80) return 'hungry';
-  if (stats.energy < 20) return 'tired';
-  if (stats.cleanliness < 30) return 'dirty';
+  if (stats.hunger > 70) return 'hungry'; // Lower threshold
+  if (stats.energy < 30) return 'tired'; // Higher threshold
+  if (stats.cleanliness < 40) return 'dirty'; // Higher threshold
   if (stats.happiness < 30) return 'sad';
   if (stats.happiness < 50 && stats.energy > 50) return 'bored';
   if (stats.happiness > 80 && stats.health > 80) return 'happy';
   
   return null;
+}
+
+export function getStateTransitions(oldPet: Pet, newPet: Pet): string[] {
+  const transitions: string[] = [];
+  
+  // State changes
+  if (oldPet.state !== newPet.state) {
+    if (newPet.state === 'sleeping') transitions.push('went_to_sleep');
+    if (oldPet.state === 'sleeping' && newPet.state !== 'sleeping') transitions.push('woke_up');
+    if (newPet.state === 'sick') transitions.push('got_sick');
+    if (oldPet.state === 'sick' && newPet.state !== 'sick') transitions.push('got_better');
+  }
+  
+  // Stat thresholds crossed
+  if (oldPet.stats.energy >= 30 && newPet.stats.energy < 30) transitions.push('got_tired');
+  if (oldPet.stats.hunger <= 70 && newPet.stats.hunger > 70) transitions.push('got_hungry');
+  if (oldPet.stats.cleanliness >= 40 && newPet.stats.cleanliness < 40) transitions.push('got_dirty');
+  if (oldPet.stats.happiness >= 30 && newPet.stats.happiness < 30) transitions.push('got_sad');
+  if (oldPet.stats.health >= 30 && newPet.stats.health < 30) transitions.push('got_sick');
+  
+  return transitions;
 }

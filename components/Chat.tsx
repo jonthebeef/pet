@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { ChatMessage, Pet } from '@/lib/types';
-import { getPetMessage, getInteractionResponse } from '@/lib/petPersonality';
-import { getPetNeed } from '@/lib/gameLogic';
+import { getPetMessage, getInteractionResponse, getTransitionMessage } from '@/lib/petPersonality';
+import { getPetNeed, getStateTransitions } from '@/lib/gameLogic';
 
 interface ChatProps {
   pet: Pet;
@@ -17,6 +17,7 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction }: ChatPr
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [lastNeed, setLastNeed] = useState<string | null>(null);
+  const [prevPet, setPrevPet] = useState<Pet>(pet);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
   
   const scrollToBottom = () => {
@@ -39,20 +40,31 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction }: ChatPr
     }]);
   }, [pet.type, ownerName]);
   
-  // Check for pet needs periodically
+  // Check for state transitions and needs
   useEffect(() => {
-    const checkNeeds = () => {
-      const need = getPetNeed(pet);
-      if (need && need !== lastNeed) {
-        setLastNeed(need);
-        const message = getPetMessage(pet, need);
-        addMessage('pet', message);
+    // Check for state transitions
+    const transitions = getStateTransitions(prevPet, pet);
+    transitions.forEach(transition => {
+      const message = getTransitionMessage(pet, transition);
+      if (message) {
+        setTimeout(() => {
+          addMessage('pet', message);
+        }, Math.random() * 1000 + 500); // Random delay between 0.5-1.5s
       }
-    };
+    });
     
-    const interval = setInterval(checkNeeds, 10000); // Check every 10 seconds
-    return () => clearInterval(interval);
-  }, [pet, lastNeed]);
+    // Check for ongoing needs
+    const need = getPetNeed(pet);
+    if (need && need !== lastNeed) {
+      setLastNeed(need);
+      const message = getPetMessage(pet, need);
+      setTimeout(() => {
+        addMessage('pet', message);
+      }, 2000); // Delay need messages so they don't overlap with transitions
+    }
+    
+    setPrevPet(pet);
+  }, [pet, prevPet, lastNeed]);
   
   // Handle interaction responses
   useEffect(() => {
