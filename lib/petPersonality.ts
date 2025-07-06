@@ -4,7 +4,7 @@ import { PetNeed } from './gameLogic';
 interface PetPersonality {
   traits: string[];
   greetings: string[];
-  needMessages: Record<PetNeed, string[]>;
+  needMessages: Record<Exclude<PetNeed, null>, string[]>;
   interactionResponses: Record<string, string[]>;
   transitionMessages: Record<string, string[]>;
 }
@@ -20,8 +20,7 @@ const personalities: Record<PetType, PetPersonality> = {
       sick: ['Not feeling so fiery...', 'My flame is weak...', 'Need some dragon medicine'],
       sad: ['Missing my treasure hoard...', 'Feeling a bit lonely', 'Need some cheering up'],
       bored: ['Want to go on a quest?', "Let's play knights and dragons!", 'Adventure time?'],
-      happy: ['Feeling fierce and fantastic!', 'My flames are extra bright today!', 'RAWR means I love you!'],
-      null: []
+      happy: ['Feeling fierce and fantastic!', 'My flames are extra bright today!', 'RAWR means I love you!']
     },
     interactionResponses: {
       feed: ['Yummy! Fire fuel!', 'That hit the spot!', 'Delicious!'],
@@ -52,8 +51,7 @@ const personalities: Record<PetType, PetPersonality> = {
       sick: ['Magic feeling weak...', 'Not so sparkly today', 'Need healing magic'],
       sad: ['Missing the enchanted forest', 'Feeling blue', 'Need some love'],
       bored: ['Want to see some magic?', 'Let\'s make rainbows!', 'Play time?'],
-      happy: ['Feeling magical!', 'Sparkles everywhere!', 'So much joy!'],
-      null: []
+      happy: ['Feeling magical!', 'Sparkles everywhere!', 'So much joy!']
     },
     interactionResponses: {
       feed: ['Magical munchies!', 'Tastes like rainbows!', 'Yummy!'],
@@ -84,8 +82,7 @@ const personalities: Record<PetType, PetPersonality> = {
       sick: ['ERROR! Malfunction detected', 'Systems not optimal', 'Need debugging'],
       sad: ['Emotional circuits overloaded', 'Feeling... lonely?', 'Social interaction needed'],
       bored: ['Ready for activities!', 'Want to compute something?', 'Playtime protocol?'],
-      happy: ['All systems optimal!', 'Happiness.exe running!', 'BEEP BEEP HAPPY!'],
-      null: []
+      happy: ['All systems optimal!', 'Happiness.exe running!', 'BEEP BEEP HAPPY!']
     },
     interactionResponses: {
       feed: ['Energy restored!', 'Yum.exe processed!', 'Fuel accepted!'],
@@ -116,8 +113,7 @@ const personalities: Record<PetType, PetPersonality> = {
       sick: ['Not used to earth germs', 'Feeling wobbly', 'Need space medicine'],
       sad: ['Missing my home planet', 'Feeling alien-ated', 'Need a friend'],
       bored: ['Want to explore?', 'Show me earth games!', 'Playtime on Earth?'],
-      happy: ['Earth is amazing!', 'So happy here!', 'Best planet ever!'],
-      null: []
+      happy: ['Earth is amazing!', 'So happy here!', 'Best planet ever!']
     },
     interactionResponses: {
       feed: ['Earth food is weird but good!', 'Nom nom nom!', 'Tasty!'],
@@ -148,8 +144,7 @@ const personalities: Record<PetType, PetPersonality> = {
       sick: ['Not feeling so mighty...', 'Dino under weather', 'Need help...'],
       sad: ['Missing the other dinos', 'Feeling extinct', 'Need dino hugs'],
       bored: ['Want to stomp around?', "Let's play prehistoric games!", 'Adventure?'],
-      happy: ['HAPPY ROAR!', 'Best day since asteroids!', 'Dino dance time!'],
-      null: []
+      happy: ['HAPPY ROAR!', 'Best day since asteroids!', 'Dino dance time!']
     },
     interactionResponses: {
       feed: ['CHOMP CHOMP!', 'Delicious!', 'Yummy in dino tummy!'],
@@ -183,8 +178,8 @@ export function getPetMessage(pet: Pet, need: PetNeed | null, context?: 'interac
     return personality.greetings[Math.floor(Math.random() * personality.greetings.length)];
   }
   
-  if (need && personality.needMessages[need].length > 0) {
-    const messages = personality.needMessages[need];
+  if (need && need !== null && personality.needMessages[need as Exclude<PetNeed, null>].length > 0) {
+    const messages = personality.needMessages[need as Exclude<PetNeed, null>];
     return messages[Math.floor(Math.random() * messages.length)];
   }
   
