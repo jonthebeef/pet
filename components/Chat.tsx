@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ChatMessage, Pet } from '@/lib/types';
 import { getPetMessage, getInteractionResponse, getTransitionMessage } from '@/lib/petPersonality';
 import { getPetNeed, getStateTransitions } from '@/lib/gameLogic';
@@ -185,6 +185,84 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpd
     if (ownerAge < 10) return 'text-lg';
     return 'text-base';
   };
+
+  // Simple markdown renderer for basic formatting
+  const renderMarkdown = (text: string) => {
+    // Process markdown formatting in order: bold first, then italic
+    let processedText = text;
+    const elements: (string | React.JSX.Element)[] = [];
+    let keyCounter = 0;
+    
+    // First pass: handle **bold** text
+    const boldRegex = /\*\*(.*?)\*\*/g;
+    const boldMatches: Array<{text: string, start: number, end: number}> = [];
+    let boldMatch: RegExpExecArray | null;
+    
+    while ((boldMatch = boldRegex.exec(text)) !== null) {
+      boldMatches.push({
+        text: boldMatch[1],
+        start: boldMatch.index,
+        end: boldMatch.index + boldMatch[0].length
+      });
+    }
+    
+    // Second pass: handle *italic* text (but not inside bold)
+    const italicRegex = /\*([^*]+?)\*/g;
+    const italicMatches: Array<{text: string, start: number, end: number}> = [];
+    let italicMatch: RegExpExecArray | null;
+    
+    while ((italicMatch = italicRegex.exec(text)) !== null) {
+      // Check if this italic is inside a bold section
+      const insideBold = boldMatches.some(bold => 
+        italicMatch!.index >= bold.start && italicMatch!.index + italicMatch![0].length <= bold.end
+      );
+      
+      if (!insideBold) {
+        italicMatches.push({
+          text: italicMatch[1],
+          start: italicMatch.index,
+          end: italicMatch.index + italicMatch[0].length
+        });
+      }
+    }
+    
+    // Combine and sort all matches
+    const allMatches = [
+      ...boldMatches.map(m => ({...m, type: 'bold' as const})),
+      ...italicMatches.map(m => ({...m, type: 'italic' as const}))
+    ].sort((a, b) => a.start - b.start);
+    
+    // Build the final result
+    let currentIndex = 0;
+    
+    for (const match of allMatches) {
+      // Add text before the match
+      if (match.start > currentIndex) {
+        elements.push(text.slice(currentIndex, match.start));
+      }
+      
+      // Add formatted text
+      if (match.type === 'bold') {
+        elements.push(<strong key={`bold-${keyCounter++}`}>{match.text}</strong>);
+      } else {
+        elements.push(<em key={`italic-${keyCounter++}`}>{match.text}</em>);
+      }
+      
+      currentIndex = match.end;
+    }
+    
+    // Add remaining text
+    if (currentIndex < text.length) {
+      elements.push(text.slice(currentIndex));
+    }
+    
+    // If no markdown found, return original text
+    if (elements.length === 0) {
+      return text;
+    }
+    
+    return elements;
+  };
   
   return (
     <div className="flex flex-col bg-white rounded-lg shadow-lg" style={{ height: '80vh' }}>
@@ -205,7 +283,7 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpd
                   : 'bg-gray-200 text-gray-800'
               } ${getFontSize()}`}
             >
-              {msg.message}
+              {renderMarkdown(msg.message)}
             </div>
           </div>
         ))}
