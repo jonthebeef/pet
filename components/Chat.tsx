@@ -8,10 +8,11 @@ import { getPetNeed } from '@/lib/gameLogic';
 interface ChatProps {
   pet: Pet;
   ownerAge: number;
+  ownerName: string;
   onInteraction?: (type: string) => void;
 }
 
-export default function Chat({ pet, ownerAge, onInteraction }: ChatProps) {
+export default function Chat({ pet, ownerAge, ownerName, onInteraction }: ChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -28,14 +29,15 @@ export default function Chat({ pet, ownerAge, onInteraction }: ChatProps) {
   
   // Initial greeting
   useEffect(() => {
-    const greeting = getPetMessage(pet, null, 'greeting');
+    const baseGreeting = getPetMessage(pet, null, 'greeting');
+    const personalizedGreeting = `${baseGreeting} Nice to meet you, ${ownerName}!`;
     setMessages([{
       id: Date.now().toString(),
       sender: 'pet',
-      message: greeting,
+      message: personalizedGreeting,
       timestamp: new Date()
     }]);
-  }, [pet.type]);
+  }, [pet.type, ownerName]);
   
   // Check for pet needs periodically
   useEffect(() => {
@@ -88,7 +90,8 @@ export default function Chat({ pet, ownerAge, onInteraction }: ChatProps) {
         body: JSON.stringify({
           pet,
           userMessage,
-          ownerAge
+          ownerAge,
+          ownerName
         })
       });
       
@@ -112,12 +115,12 @@ export default function Chat({ pet, ownerAge, onInteraction }: ChatProps) {
   };
   
   return (
-    <div className="flex flex-col h-full bg-white rounded-lg shadow-lg">
-      <div className="bg-gradient-to-r from-tamagotchi-pink to-tamagotchi-purple text-white p-4 rounded-t-lg">
+    <div className="flex flex-col bg-white rounded-lg shadow-lg" style={{ height: '80vh' }}>
+      <div className="bg-gradient-to-r from-tamagotchi-pink to-tamagotchi-purple text-white p-4 rounded-t-lg flex-shrink-0">
         <h2 className="text-xl font-bold">Chat with {pet.name}</h2>
       </div>
       
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
         {messages.map((msg) => (
           <div
             key={msg.id}
@@ -150,7 +153,7 @@ export default function Chat({ pet, ownerAge, onInteraction }: ChatProps) {
         <div ref={messagesEndRef} />
       </div>
       
-      <div className="p-4 border-t">
+      <div className="p-4 border-t flex-shrink-0">
         <form
           onSubmit={(e) => {
             e.preventDefault();

@@ -22,7 +22,7 @@ export default function GameLayout({ pet, onPetUpdate, playerName, playerAge }: 
           <p className="text-gray-600 mt-1">Take good care of {pet.name}!</p>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 h-[80vh]">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6" style={{ height: '80vh' }}>
           {/* Left side - Tamagotchi Device (2/5 width on large screens) */}
           <div className="lg:col-span-2 h-full">
             <div className="h-full flex items-center justify-center">
@@ -32,7 +32,7 @@ export default function GameLayout({ pet, onPetUpdate, playerName, playerAge }: 
           
           {/* Right side - Chat (3/5 width on large screens) */}
           <div className="lg:col-span-3 h-full">
-            <Chat pet={pet} ownerAge={playerAge} />
+            <Chat pet={pet} ownerAge={playerAge} ownerName={playerName} />
           </div>
         </div>
         

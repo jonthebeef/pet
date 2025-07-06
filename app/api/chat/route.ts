@@ -7,7 +7,7 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || '',
 });
 
-function getAgeAppropriatePrompt(ownerAge: number, pet: Pet, userMessage: string): string {
+function getAgeAppropriatePrompt(ownerAge: number, ownerName: string, pet: Pet, userMessage: string): string {
   const personality = getPetPersonality(pet.type);
   const traits = personality.traits.join(', ');
   
@@ -52,6 +52,7 @@ function getAgeAppropriatePrompt(ownerAge: number, pet: Pet, userMessage: string
   }
   
   return `You are ${pet.name}, a ${pet.type} digital pet with these traits: ${traits}.
+Your owner is ${ownerName}, who is ${ownerAge} years old.
   
 ${ageGuidelines}
 
@@ -62,31 +63,32 @@ Current stats:
 - Energy: ${pet.stats.energy}%
 - Cleanliness: ${pet.stats.cleanliness}%
 
-The user said: "${userMessage}"
+${ownerName} said: "${userMessage}"
 
-Respond as the pet in 1-2 SHORT sentences max. Be conversational and reflect your current state/needs.
+Respond as the pet in 1-2 SHORT sentences max. Use ${ownerName}'s name occasionally when appropriate.
+Be conversational and reflect your current state/needs.
 If you're hungry (>70%), tired (<30% energy), dirty (<30% clean), or sick (<30% health), mention it naturally.`;
 }
 
 export async function POST(request: Request) {
   try {
-    const { pet, userMessage, ownerAge } = await request.json();
+    const { pet, userMessage, ownerAge, ownerName } = await request.json();
     
     if (!process.env.ANTHROPIC_API_KEY) {
       // Return a fallback response if no API key
       const personality = getPetPersonality(pet.type);
       const fallbackResponses = [
-        ...personality.greetings,
-        'Hello friend!',
-        'Nice to see you!',
-        'How are you today?'
+        ...personality.greetings.map(g => `${g} How are you, ${ownerName}?`),
+        `Hello ${ownerName}!`,
+        `Nice to see you, ${ownerName}!`,
+        `How are you today, ${ownerName}?`
       ];
       return NextResponse.json({
         message: fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)]
       });
     }
     
-    const prompt = getAgeAppropriatePrompt(ownerAge, pet, userMessage);
+    const prompt = getAgeAppropriatePrompt(ownerAge, ownerName, pet, userMessage);
     
     const response = await anthropic.messages.create({
       model: 'claude-3-haiku-20240307',
