@@ -21,6 +21,7 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpd
   const [prevPet, setPrevPet] = useState<Pet>(pet);
   const [recentTransitions, setRecentTransitions] = useState<Set<string>>(new Set());
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -29,6 +30,19 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpd
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Handle tab key to focus input field
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        inputRef.current?.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
   
   // Initial greeting
   useEffect(() => {
@@ -312,11 +326,12 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpd
           className="flex gap-2"
         >
           <input
+            ref={inputRef}
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder={ownerAge < 10 ? "Say hi! 👋" : "Type a message..."}
-            className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-full focus:border-tamagotchi-purple focus:outline-none"
+            className="flex-1 px-4 py-4 border-2 border-gray-300 rounded-full focus:border-tamagotchi-purple focus:outline-none text-lg"
           />
           <button
             type="submit"

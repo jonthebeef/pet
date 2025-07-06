@@ -1,12 +1,25 @@
 'use client';
 
 import { Pet } from '@/lib/types';
+import { useEffect, useState } from 'react';
 
 interface StatusBarProps {
   pet: Pet;
 }
 
 export default function StatusBar({ pet }: StatusBarProps) {
+  const [prevHealth, setPrevHealth] = useState(pet.stats.health);
+  const [healthSparkle, setHealthSparkle] = useState(false);
+
+  // Watch for health increases
+  useEffect(() => {
+    if (pet.stats.health > prevHealth) {
+      setHealthSparkle(true);
+      setTimeout(() => setHealthSparkle(false), 2000); // Sparkle for 2 seconds
+    }
+    setPrevHealth(pet.stats.health);
+  }, [pet.stats.health, prevHealth]);
+
   const getStatColor = (value: number, inverted: boolean = false) => {
     const adjustedValue = inverted ? 100 - value : value;
     if (adjustedValue >= 70) return 'bg-green-500';
@@ -41,16 +54,21 @@ export default function StatusBar({ pet }: StatusBarProps) {
           </div>
         </div>
         
-        <div>
+        <div className="relative">
           <div className="flex justify-between text-xs text-gray-300 mb-1">
-            <span>❤️ Health</span>
+            <span>❤️ Health {healthSparkle && <span className="animate-pulse">✨</span>}</span>
             <span>{Math.round(pet.stats.health)}%</span>
           </div>
-          <div className="w-full bg-gray-700 rounded-full h-2">
+          <div className="w-full bg-gray-700 rounded-full h-2 relative">
             <div 
-              className={`h-2 rounded-full transition-all ${getStatColor(pet.stats.health)}`}
+              className={`h-2 rounded-full transition-all duration-500 ${getStatColor(pet.stats.health)} ${healthSparkle ? 'animate-pulse shadow-lg shadow-green-400' : ''}`}
               style={{ width: `${pet.stats.health}%` }}
             />
+            {healthSparkle && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-xs animate-bounce">💖</span>
+              </div>
+            )}
           </div>
         </div>
         

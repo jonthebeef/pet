@@ -204,7 +204,7 @@ function getStatChanges(tone: 'positive' | 'negative', pet: Pet) {
   if (tone === 'positive') {
     return {
       happiness: Math.min(100, pet.stats.happiness + 20),
-      health: Math.min(100, pet.stats.health + 10),
+      health: Math.min(100, pet.stats.health + 15), // Increased from 10 to 15 for more visible effect
       energy: Math.min(100, pet.stats.energy + 5),
       hunger: Math.max(0, pet.stats.hunger - 5)
     };
