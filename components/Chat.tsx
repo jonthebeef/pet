@@ -56,7 +56,10 @@ export default function Chat({ pet, ownerAge, onInteraction }: ChatProps) {
   useEffect(() => {
     if (pet.state === 'eating' || pet.state === 'playing') {
       const response = getInteractionResponse(pet, pet.state === 'eating' ? 'feed' : 'play');
-      addMessage('pet', response);
+      // Use a timeout to avoid state updates during render
+      setTimeout(() => {
+        addMessage('pet', response);
+      }, 100);
     }
   }, [pet.state]);
   

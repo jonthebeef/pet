@@ -21,13 +21,17 @@ export default function TamagotchiDevice({ pet: initialPet, onPetUpdate }: Tamag
     const interval = setInterval(() => {
       setPet(currentPet => {
         const updatedPet = updatePetStats(currentPet);
-        onPetUpdate(updatedPet);
         return updatedPet;
       });
     }, 1000);
     
     return () => clearInterval(interval);
-  }, [onPetUpdate]);
+  }, []);
+  
+  // Notify parent of pet changes separately
+  useEffect(() => {
+    onPetUpdate(pet);
+  }, [pet, onPetUpdate]);
   
   const handleInteraction = (type: InteractionType) => {
     if (pet.state === 'dead') {
@@ -38,7 +42,6 @@ export default function TamagotchiDevice({ pet: initialPet, onPetUpdate }: Tamag
     
     const updatedPet = interactWithPet(pet, type);
     setPet(updatedPet);
-    onPetUpdate(updatedPet);
     
     // Show feedback message
     const messages = {
