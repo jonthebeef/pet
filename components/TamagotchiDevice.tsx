@@ -78,10 +78,12 @@ export default function TamagotchiDevice({ pet: initialPet, onPetUpdate }: Tamag
         
         <StatusBar pet={pet} />
         
-        <InteractionButtons 
-          onInteraction={handleInteraction}
-          disabled={pet.state === 'dead'}
-        />
+        {pet.state !== 'dead' && (
+          <InteractionButtons 
+            onInteraction={handleInteraction}
+            disabled={false}
+          />
+        )}
       </div>
     </div>
   );

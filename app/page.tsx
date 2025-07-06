@@ -65,6 +65,7 @@ export default function Home() {
       onPetUpdate={handlePetUpdate}
       playerName={currentPlayer.name}
       playerAge={currentPlayer.age}
+      onNewPet={handleNewPet}
     />
   );
 }

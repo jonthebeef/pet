@@ -9,9 +9,10 @@ interface GameLayoutProps {
   onPetUpdate: (pet: Pet) => void;
   playerName: string;
   playerAge: number;
+  onNewPet: () => void;
 }
 
-export default function GameLayout({ pet, onPetUpdate, playerName, playerAge }: GameLayoutProps) {
+export default function GameLayout({ pet, onPetUpdate, playerName, playerAge, onNewPet }: GameLayoutProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 to-pink-100 p-4">
       <div className="max-w-7xl mx-auto">
@@ -43,7 +44,7 @@ export default function GameLayout({ pet, onPetUpdate, playerName, playerAge }: 
               {pet.name} lived for {Math.floor(pet.age / 24)} days and {Math.floor(pet.age % 24)} hours.
             </p>
             <button
-              onClick={() => window.location.reload()}
+              onClick={onNewPet}
               className="bg-gradient-to-r from-tamagotchi-pink to-tamagotchi-purple text-white font-bold py-3 px-6 rounded-xl transform transition-all hover:scale-105 active:scale-95"
             >
               Adopt a New Pet
