@@ -189,7 +189,55 @@ function getKindnessResponse(pet: any, ownerName: string): string {
   return kindnessMessages[Math.floor(Math.random() * kindnessMessages.length)];
 }
 
-function getPositiveResponse(pet: any, ownerName: string): string {
+function getAgeAppropriateQuestions(ownerAge: number): string[] {
+  if (ownerAge < 6) {
+    return [
+      "What's your favorite color? 🌈",
+      "Do you like to draw pictures? 🎨",
+      "What makes you smile? 😊",
+      "Do you have a favorite toy? 🧸",
+      "What's your favorite snack? 🍪"
+    ];
+  } else if (ownerAge < 10) {
+    return [
+      "What was the best part of your day? ✨",
+      "If you could have any superpower, what would it be? 🦸",
+      "What's your favorite game to play? 🎮",
+      "Do you have a favorite book or story? 📚",
+      "What makes you laugh the most? 😄",
+      "If you could visit anywhere, where would you go? 🗺️"
+    ];
+  } else if (ownerAge < 13) {
+    return [
+      "What's something cool you learned recently? 🤔",
+      "What kind of music do you like? 🎵",
+      "What's your favorite subject in school? 📖",
+      "If you could meet anyone, who would it be? ⭐",
+      "What's your dream adventure? 🏔️",
+      "What hobby makes you happiest? 🎯"
+    ];
+  } else if (ownerAge < 18) {
+    return [
+      "What's inspiring you lately? 💫",
+      "What's a goal you're working toward? 🎯",
+      "What's the most interesting thing you've discovered recently? 🔍",
+      "If you could change one thing about the world, what would it be? 🌍",
+      "What's your favorite way to relax? 🌺",
+      "What are you most grateful for today? 🙏"
+    ];
+  } else {
+    return [
+      "What's bringing you joy these days? ☀️",
+      "What's something you're looking forward to? 🌟",
+      "What's a small win you've had recently? 🏆",
+      "If you could master any skill instantly, what would it be? 🎨",
+      "What's your favorite way to unwind? 🌿",
+      "What made you smile today? 😊"
+    ];
+  }
+}
+
+function getPositiveResponse(pet: any, ownerName: string, messageCount?: number, ownerAge?: number): string {
   const positiveMessages = [
     `Aww, you're so sweet ${ownerName}! That makes my heart sparkle! ✨`,
     `Your kindness fills me with so much joy! Thank you for being wonderful!`,
@@ -197,6 +245,15 @@ function getPositiveResponse(pet: any, ownerName: string): string {
     `You're the best friend a pet could ask for, ${ownerName}! 💖`,
     `Your gentle words make me feel so loved and special!`
   ];
+  
+  // Sometimes ask a question after positive interactions (about 1 in 3 times after 3+ messages)
+  if (messageCount && messageCount >= 3 && Math.random() < 0.33 && ownerAge !== undefined) {
+    const response = positiveMessages[Math.floor(Math.random() * positiveMessages.length)];
+    const questions = getAgeAppropriateQuestions(ownerAge);
+    const question = questions[Math.floor(Math.random() * questions.length)];
+    return `${response} ${question}`;
+  }
+  
   return positiveMessages[Math.floor(Math.random() * positiveMessages.length)];
 }
 
@@ -220,7 +277,7 @@ function getStatChanges(tone: 'positive' | 'negative', pet: Pet) {
 
 export async function POST(request: Request) {
   try {
-    const { pet, userMessage, ownerAge, ownerName } = await request.json();
+    const { pet, userMessage, ownerAge, ownerName, messageCount } = await request.json();
     
     // Step 1: Use enhanced local filtering first
     const localToneAnalysis = analyzeMessageTone(userMessage);
@@ -229,7 +286,7 @@ export async function POST(request: Request) {
     if (localToneAnalysis === 'positive') {
       const statChanges = getStatChanges('positive', pet);
       return NextResponse.json({
-        message: getPositiveResponse(pet, ownerName),
+        message: getPositiveResponse(pet, ownerName, messageCount, ownerAge),
         statChanges
       });
     }

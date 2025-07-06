@@ -21,6 +21,7 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpd
   const [prevPet, setPrevPet] = useState<Pet>(pet);
   const [recentTransitions, setRecentTransitions] = useState<Set<string>>(new Set());
   const [lastNeedMessageTime, setLastNeedMessageTime] = useState<number>(0);
+  const [userMessageCount, setUserMessageCount] = useState(0);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   
@@ -153,6 +154,7 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpd
     const userMessage = inputValue;
     setInputValue('');
     addMessage('user', userMessage);
+    setUserMessageCount(prev => prev + 1);
     
     // Keep focus on input after sending
     setTimeout(() => {
@@ -169,7 +171,8 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpd
           pet,
           userMessage,
           ownerAge,
-          ownerName
+          ownerName,
+          messageCount: userMessageCount + 1
         })
       });
       
