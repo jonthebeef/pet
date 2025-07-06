@@ -33,7 +33,7 @@ export default function GameLayout({ pet, onPetUpdate, playerName, playerAge, on
           
           {/* Right side - Chat (3/5 width on large screens) */}
           <div className="lg:col-span-3 h-full">
-            <Chat pet={pet} ownerAge={playerAge} ownerName={playerName} />
+            <Chat pet={pet} ownerAge={playerAge} ownerName={playerName} onPetUpdate={onPetUpdate} />
           </div>
         </div>
         

@@ -140,24 +140,46 @@ export async function POST(request: Request) {
   try {
     const { pet, userMessage, ownerAge, ownerName } = await request.json();
     
-    // Basic client-side filtering
-    if (containsInappropriateContent(userMessage)) {
-      return NextResponse.json({
-        message: getKindnessResponse(pet, ownerName)
-      });
-    }
+    let statChanges = {};
+    let responseMessage = '';
     
-    // Positive reinforcement for kind messages
-    if (containsPositiveContent(userMessage)) {
-      // Still go to Claude for a personalized response, but include positive context
-      // This will be handled by the enhanced prompt
+    // Handle negative content - impacts pet's wellbeing
+    if (containsInappropriateContent(userMessage)) {
+      statChanges = {
+        happiness: Math.max(0, pet.stats.happiness - 15),
+        health: Math.max(0, pet.stats.health - 10),
+        energy: Math.max(0, pet.stats.energy - 5),
+        // Stress can make pets hungrier
+        hunger: Math.min(100, pet.stats.hunger + 10)
+      };
+      responseMessage = getKindnessResponse(pet, ownerName);
+    }
+    // Handle positive content - boosts pet's wellbeing
+    else if (containsPositiveContent(userMessage)) {
+      statChanges = {
+        happiness: Math.min(100, pet.stats.happiness + 20),
+        health: Math.min(100, pet.stats.health + 10),
+        energy: Math.min(100, pet.stats.energy + 5),
+        // Happiness can reduce hunger slightly
+        hunger: Math.max(0, pet.stats.hunger - 5)
+      };
+      // Continue to get personalized response from Claude
     }
     
     if (!process.env.ANTHROPIC_API_KEY) {
       // Return a fallback response if no API key
+      if (responseMessage) {
+        // Already have a message from negative content handling
+        return NextResponse.json({
+          message: responseMessage,
+          statChanges
+        });
+      }
+      
       if (containsPositiveContent(userMessage)) {
         return NextResponse.json({
-          message: getPositiveResponse(pet, ownerName)
+          message: getPositiveResponse(pet, ownerName),
+          statChanges
         });
       }
       
@@ -170,7 +192,8 @@ export async function POST(request: Request) {
         `Your kindness makes me so happy, ${ownerName}!`
       ];
       return NextResponse.json({
-        message: fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)]
+        message: fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)],
+        statChanges
       });
     }
     
@@ -192,13 +215,17 @@ export async function POST(request: Request) {
       ? response.content[0].text 
       : 'Woof!';
     
-    return NextResponse.json({ message });
+    return NextResponse.json({ 
+      message: responseMessage || message,
+      statChanges 
+    });
     
   } catch (error) {
     console.error('Chat API error:', error);
     // Return personality-based fallback
     return NextResponse.json({ 
-      message: "Hey there! How's it going?" 
+      message: "Hey there! How's it going?",
+      statChanges: {}
     });
   }
 }

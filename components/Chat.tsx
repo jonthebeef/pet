@@ -10,9 +10,10 @@ interface ChatProps {
   ownerAge: number;
   ownerName: string;
   onInteraction?: (type: string) => void;
+  onPetUpdate?: (pet: Pet) => void;
 }
 
-export default function Chat({ pet, ownerAge, ownerName, onInteraction }: ChatProps) {
+export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpdate }: ChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -111,6 +112,37 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction }: ChatPr
       setTimeout(() => {
         addMessage('pet', data.message);
         setIsTyping(false);
+        
+        // Apply stat changes if they exist
+        if (data.statChanges && onPetUpdate) {
+          const updatedPet = {
+            ...pet,
+            stats: {
+              ...pet.stats,
+              ...data.statChanges
+            },
+            lastInteraction: new Date()
+          };
+          onPetUpdate(updatedPet);
+          
+          // Show visual feedback for stat changes
+          const hasPositiveChanges = Object.values(data.statChanges).some((change: any) => 
+            (typeof change === 'number' && change > pet.stats[Object.keys(data.statChanges)[Object.values(data.statChanges).indexOf(change)] as keyof typeof pet.stats])
+          );
+          const hasNegativeChanges = Object.values(data.statChanges).some((change: any) => 
+            (typeof change === 'number' && change < pet.stats[Object.keys(data.statChanges)[Object.values(data.statChanges).indexOf(change)] as keyof typeof pet.stats])
+          );
+          
+          if (hasPositiveChanges) {
+            setTimeout(() => {
+              addMessage('pet', '✨ *feels happier and healthier* ✨');
+            }, 1500);
+          } else if (hasNegativeChanges) {
+            setTimeout(() => {
+              addMessage('pet', '💔 *feels hurt and stressed* 💔');
+            }, 1500);
+          }
+        }
       }, 500 + Math.random() * 1000); // Random delay for natural feel
       
     } catch (error) {
