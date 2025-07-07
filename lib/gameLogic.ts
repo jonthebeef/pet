@@ -1,11 +1,11 @@
 import { Pet, PetStats, PetState, InteractionType, PetType } from './types';
 
 const STAT_DECAY_RATES = {
-  happiness: 2, // per hour
-  health: 1, // per hour
-  hunger: 5, // per hour (increases)
-  energy: 3, // per hour
-  cleanliness: 4, // per hour (increased to get dirty faster)
+  happiness: 8, // per hour (increased for more visible changes)
+  health: 2, // per hour (increased slightly)
+  hunger: 12, // per hour (increases - made faster)
+  energy: 6, // per hour (increased)
+  cleanliness: 10, // per hour (increased for more visible changes)
 };
 
 const LIFESPAN_RANGES = {
@@ -43,14 +43,15 @@ export function createPet(name: string, owner: string, ownerAge: number, type: P
 
 export function updatePetStats(pet: Pet): Pet {
   const now = new Date();
-  const hoursSinceLastUpdate = (now.getTime() - pet.lastInteraction.getTime()) / (1000 * 60 * 60);
+  // Use a base decay rate per update (called every second)
+  const decayPerSecond = 1 / 3600; // 1 hour = 3600 seconds
   
   const newStats: PetStats = {
-    happiness: Math.max(0, pet.stats.happiness - STAT_DECAY_RATES.happiness * hoursSinceLastUpdate),
-    health: Math.max(0, pet.stats.health - STAT_DECAY_RATES.health * hoursSinceLastUpdate),
-    hunger: Math.min(100, pet.stats.hunger + STAT_DECAY_RATES.hunger * hoursSinceLastUpdate),
-    energy: Math.max(0, pet.stats.energy - STAT_DECAY_RATES.energy * hoursSinceLastUpdate),
-    cleanliness: Math.max(0, pet.stats.cleanliness - STAT_DECAY_RATES.cleanliness * hoursSinceLastUpdate),
+    happiness: Math.max(0, pet.stats.happiness - STAT_DECAY_RATES.happiness * decayPerSecond),
+    health: Math.max(0, pet.stats.health - STAT_DECAY_RATES.health * decayPerSecond),
+    hunger: Math.min(100, pet.stats.hunger + STAT_DECAY_RATES.hunger * decayPerSecond),
+    energy: Math.max(0, pet.stats.energy - STAT_DECAY_RATES.energy * decayPerSecond),
+    cleanliness: Math.max(0, pet.stats.cleanliness - STAT_DECAY_RATES.cleanliness * decayPerSecond),
   };
   
   // Health deteriorates faster if other stats are low
@@ -63,7 +64,7 @@ export function updatePetStats(pet: Pet): Pet {
     newStats.health = Math.max(20, newStats.health - 30);
   }
   
-  const newAge = pet.age + hoursSinceLastUpdate;
+  const newAge = pet.age + decayPerSecond; // Age increases by 1/3600 per second = 1 hour per 3600 seconds
   
   // Check if pet should die
   const shouldDie = newStats.health === 0 || 
@@ -80,9 +81,9 @@ export function updatePetStats(pet: Pet): Pet {
     ...pet,
     stats: newStats,
     state: newState,
-    lastInteraction: now,
     age: newAge,
     deathDate: shouldDie && !pet.deathDate ? now : pet.deathDate,
+    // Don't update lastInteraction here - only update it on actual interactions
   };
 }
 
@@ -97,13 +98,16 @@ export function interactWithPet(pet: Pet, interaction: InteractionType): Pet {
       stats.hunger = Math.max(0, stats.hunger - 30);
       stats.happiness = Math.min(100, stats.happiness + 10);
       stats.health = Math.min(100, stats.health + 5);
+      stats.energy = Math.max(0, stats.energy - 5); // Digestion makes slightly tired
+      stats.cleanliness = Math.max(0, stats.cleanliness - 5); // Messy eating
       updatedPet.state = 'eating';
       break;
       
     case 'treat':
       stats.hunger = Math.max(0, stats.hunger - 10);
       stats.happiness = Math.min(100, stats.happiness + 20);
-      updatedPet.state = 'happy';
+      stats.energy = Math.min(100, stats.energy + 5); // Sugar rush!
+      stats.cleanliness = Math.max(0, stats.cleanliness - 3); // Slightly messy
       break;
       
     case 'play':
@@ -111,6 +115,8 @@ export function interactWithPet(pet: Pet, interaction: InteractionType): Pet {
         stats.happiness = Math.min(100, stats.happiness + 25);
         stats.energy = Math.max(0, stats.energy - 15);
         stats.hunger = Math.min(100, stats.hunger + 10);
+        stats.cleanliness = Math.max(0, stats.cleanliness - 15); // Playing makes dirty!
+        stats.health = Math.min(100, stats.health + 3); // Exercise is healthy
         updatedPet.state = 'playing';
       }
       break;
@@ -118,6 +124,8 @@ export function interactWithPet(pet: Pet, interaction: InteractionType): Pet {
     case 'sleep':
       stats.energy = Math.min(100, stats.energy + 40);
       stats.health = Math.min(100, stats.health + 10);
+      stats.hunger = Math.min(100, stats.hunger + 5); // Get hungry while sleeping
+      stats.happiness = Math.min(100, stats.happiness + 5); // Good rest = happy
       updatedPet.state = 'sleeping';
       break;
       
@@ -125,19 +133,31 @@ export function interactWithPet(pet: Pet, interaction: InteractionType): Pet {
       stats.cleanliness = 100;
       stats.happiness = Math.min(100, stats.happiness + 15);
       stats.health = Math.min(100, stats.health + 10);
+      stats.energy = Math.max(0, stats.energy - 5); // Takes effort to bathe
       break;
       
     case 'medicine':
       if (updatedPet.state === 'sick') {
         stats.health = Math.min(100, stats.health + 30);
-        stats.happiness = Math.min(100, stats.happiness + 10);
+        stats.happiness = Math.max(0, stats.happiness - 5); // Medicine tastes bad
+        stats.energy = Math.max(0, stats.energy - 10); // Medicine makes drowsy
       }
       break;
+  }
+  
+  // Keep temporary states (eating, playing) but for others, recalculate based on stats
+  let finalState = updatedPet.state;
+  if (updatedPet.state !== 'eating' && updatedPet.state !== 'playing' && updatedPet.state !== 'sleeping') {
+    finalState = stats.health < 30 ? 'sick' :
+                stats.energy < 20 ? 'sleeping' :
+                stats.hunger > 70 ? 'sad' :
+                stats.happiness > 70 ? 'happy' : 'sad';
   }
   
   return {
     ...updatedPet,
     stats,
+    state: finalState,
     lastInteraction: new Date(),
   };
 }
