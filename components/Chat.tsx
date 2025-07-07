@@ -199,14 +199,14 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpd
           
           // Show visual feedback for stat changes
           // Check if happiness, health, or energy increased (positive changes)
-          const happinessUp = data.statChanges.happiness && data.statChanges.happiness > pet.stats.happiness;
-          const healthUp = data.statChanges.health && data.statChanges.health > pet.stats.health;
-          const energyUp = data.statChanges.energy && data.statChanges.energy > pet.stats.energy;
+          const happinessUp = data.statChanges.happiness !== undefined && data.statChanges.happiness > pet.stats.happiness;
+          const healthUp = data.statChanges.health !== undefined && data.statChanges.health > pet.stats.health;
+          const energyUp = data.statChanges.energy !== undefined && data.statChanges.energy > pet.stats.energy;
           
           // Check if happiness, health, or energy decreased (negative changes)
-          const happinessDown = data.statChanges.happiness && data.statChanges.happiness < pet.stats.happiness;
-          const healthDown = data.statChanges.health && data.statChanges.health < pet.stats.health;
-          const energyDown = data.statChanges.energy && data.statChanges.energy < pet.stats.energy;
+          const happinessDown = data.statChanges.happiness !== undefined && data.statChanges.happiness < pet.stats.happiness;
+          const healthDown = data.statChanges.health !== undefined && data.statChanges.health < pet.stats.health;
+          const energyDown = data.statChanges.energy !== undefined && data.statChanges.energy < pet.stats.energy;
           
           if (happinessUp || healthUp || energyUp) {
             setTimeout(() => {
