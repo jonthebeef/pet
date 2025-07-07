@@ -38,6 +38,7 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpd
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Tab') {
         e.preventDefault();
+        console.log('🎯 Tab pressed, focusing input, ref:', inputRef.current);
         inputRef.current?.focus();
       }
     };
@@ -59,6 +60,7 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpd
     
     // Auto-focus input on load
     setTimeout(() => {
+      console.log('🎯 Attempting initial focus, input ref:', inputRef.current);
       inputRef.current?.focus();
     }, 100);
   }, [pet.type, ownerName]);
@@ -143,6 +145,7 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpd
     // Restore focus if it was on input
     if (wasInputFocused && sender === 'pet') {
       setTimeout(() => {
+        console.log('🎯 Restoring focus after pet message, input ref:', inputRef.current);
         inputRef.current?.focus();
       }, 50);
     }
@@ -158,6 +161,7 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpd
     
     // Keep focus on input after sending
     setTimeout(() => {
+      console.log('🎯 Restoring focus after send, input ref:', inputRef.current);
       inputRef.current?.focus();
     }, 100);
     

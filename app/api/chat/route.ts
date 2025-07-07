@@ -388,9 +388,11 @@ export async function POST(request: Request) {
     
   } catch (error) {
     console.error('Chat API error:', error);
+    console.error('Error details:', JSON.stringify(error, null, 2));
     return NextResponse.json({ 
       message: "Hey there! How's it going?",
-      statChanges: {}
+      statChanges: {},
+      error: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 }
