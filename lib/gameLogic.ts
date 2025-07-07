@@ -1,11 +1,11 @@
 import { Pet, PetStats, PetState, InteractionType, PetType } from './types';
 
 const STAT_DECAY_RATES = {
-  happiness: 8, // per hour (increased for more visible changes)
-  health: 2, // per hour (increased slightly)
-  hunger: 12, // per hour (increases - made faster)
-  energy: 6, // per hour (increased)
-  cleanliness: 10, // per hour (increased for more visible changes)
+  happiness: 4, // per hour (reduced from 8)
+  health: 1, // per hour (reduced from 2)
+  hunger: 6, // per hour (reduced from 12)
+  energy: 3, // per hour (reduced from 6)
+  cleanliness: 5, // per hour (reduced from 10)
 };
 
 const LIFESPAN_RANGES = {
@@ -98,7 +98,7 @@ export function interactWithPet(pet: Pet, interaction: InteractionType): Pet {
       stats.hunger = Math.max(0, stats.hunger - 30);
       stats.happiness = Math.min(100, stats.happiness + 10);
       stats.health = Math.min(100, stats.health + 5);
-      stats.energy = Math.max(0, stats.energy - 5); // Digestion makes slightly tired
+      stats.energy = Math.min(100, stats.energy + 10); // Food gives energy!
       stats.cleanliness = Math.max(0, stats.cleanliness - 5); // Messy eating
       updatedPet.state = 'eating';
       break;
