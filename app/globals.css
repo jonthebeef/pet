@@ -9,7 +9,7 @@
 }
 
 @layer components {
-  .tamagotchi-screen {
+  .pixelpet-screen {
     @apply bg-gradient-to-b from-gray-900 to-gray-800 rounded-3xl shadow-2xl border-8 border-gray-700;
   }
   

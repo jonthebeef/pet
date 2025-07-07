@@ -313,7 +313,7 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpd
   
   return (
     <div className="flex flex-col bg-white rounded-lg shadow-lg" style={{ height: '80vh' }}>
-      <div className="bg-gradient-to-r from-tamagotchi-pink to-tamagotchi-purple text-white p-4 rounded-t-lg flex-shrink-0">
+      <div className="bg-gradient-to-r from-pixelpet-pink to-pixelpet-purple text-white p-4 rounded-t-lg flex-shrink-0">
         <h2 className="text-xl font-bold">Chat with {pet.name}</h2>
       </div>
       
@@ -364,12 +364,12 @@ export default function Chat({ pet, ownerAge, ownerName, onInteraction, onPetUpd
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder={ownerAge < 10 ? "Say hi! 👋" : "Type a message..."}
-            className="flex-1 px-4 py-4 border-2 border-gray-300 rounded-full focus:border-tamagotchi-purple focus:outline-none text-lg"
+            className="flex-1 px-4 py-4 border-2 border-gray-300 rounded-full focus:border-pixelpet-purple focus:outline-none text-lg"
           />
           <button
             type="submit"
             disabled={!inputValue.trim() || isTyping}
-            className="bg-gradient-to-r from-tamagotchi-pink to-tamagotchi-purple text-white px-6 py-2 rounded-full disabled:opacity-50 hover:opacity-90 transition-opacity"
+            className="bg-gradient-to-r from-pixelpet-pink to-pixelpet-purple text-white px-6 py-2 rounded-full disabled:opacity-50 hover:opacity-90 transition-opacity"
           >
             Send
           </button>

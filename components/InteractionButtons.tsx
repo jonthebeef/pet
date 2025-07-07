@@ -9,11 +9,11 @@ interface InteractionButtonsProps {
 
 export default function InteractionButtons({ onInteraction, disabled }: InteractionButtonsProps) {
   const buttons = [
-    { type: 'feed' as InteractionType, icon: '🍖', label: 'Feed', color: 'bg-tamagotchi-yellow' },
-    { type: 'treat' as InteractionType, icon: '🍬', label: 'Treat', color: 'bg-tamagotchi-pink' },
-    { type: 'play' as InteractionType, icon: '🎮', label: 'Play', color: 'bg-tamagotchi-blue' },
-    { type: 'sleep' as InteractionType, icon: '😴', label: 'Sleep', color: 'bg-tamagotchi-purple' },
-    { type: 'clean' as InteractionType, icon: '🧼', label: 'Clean', color: 'bg-tamagotchi-green' },
+    { type: 'feed' as InteractionType, icon: '🍖', label: 'Feed', color: 'bg-pixelpet-yellow' },
+    { type: 'treat' as InteractionType, icon: '🍬', label: 'Treat', color: 'bg-pixelpet-pink' },
+    { type: 'play' as InteractionType, icon: '🎮', label: 'Play', color: 'bg-pixelpet-blue' },
+    { type: 'sleep' as InteractionType, icon: '😴', label: 'Sleep', color: 'bg-pixelpet-purple' },
+    { type: 'clean' as InteractionType, icon: '🧼', label: 'Clean', color: 'bg-pixelpet-green' },
     { type: 'medicine' as InteractionType, icon: '💊', label: 'Medicine', color: 'bg-red-400' },
   ];
   

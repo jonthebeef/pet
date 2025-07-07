@@ -12,7 +12,7 @@ export default function Home() {
   
   // Load saved data on mount
   useEffect(() => {
-    const savedData = localStorage.getItem('tamagotchi-save');
+    const savedData = localStorage.getItem('pixelpet-save');
     if (savedData) {
       const { player, pet } = JSON.parse(savedData);
       if (pet && player) {
@@ -33,7 +33,7 @@ export default function Home() {
     setCurrentPet(newPet);
     
     // Save to localStorage
-    localStorage.setItem('tamagotchi-save', JSON.stringify({
+    localStorage.setItem('pixelpet-save', JSON.stringify({
       player: newPlayer,
       pet: newPet,
     }));
@@ -43,7 +43,7 @@ export default function Home() {
     setCurrentPet(updatedPet);
     
     // Save to localStorage
-    localStorage.setItem('tamagotchi-save', JSON.stringify({
+    localStorage.setItem('pixelpet-save', JSON.stringify({
       player: currentPlayer,
       pet: updatedPet,
     }));
@@ -52,7 +52,7 @@ export default function Home() {
   const handleNewPet = () => {
     setCurrentPet(null);
     setCurrentPlayer(null);
-    localStorage.removeItem('tamagotchi-save');
+    localStorage.removeItem('pixelpet-save');
   };
   
   if (!currentPet || !currentPlayer) {

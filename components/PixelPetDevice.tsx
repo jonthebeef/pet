@@ -7,12 +7,12 @@ import PetDisplay from './PetDisplay';
 import StatusBar from './StatusBar';
 import InteractionButtons from './InteractionButtons';
 
-interface TamagotchiDeviceProps {
+interface PixelPetDeviceProps {
   pet: Pet;
   onPetUpdate: (pet: Pet) => void;
 }
 
-export default function TamagotchiDevice({ pet: initialPet, onPetUpdate }: TamagotchiDeviceProps) {
+export default function PixelPetDevice({ pet: initialPet, onPetUpdate }: PixelPetDeviceProps) {
   const [pet, setPet] = useState(initialPet);
   const [showMessage, setShowMessage] = useState('');
   
@@ -61,7 +61,7 @@ export default function TamagotchiDevice({ pet: initialPet, onPetUpdate }: Tamag
   
   return (
     <div className="max-w-md mx-auto">
-      <div className="tamagotchi-screen p-6">
+      <div className="pixelpet-screen p-6">
         <div className="led-display h-64 relative overflow-hidden mb-4">
           <PetDisplay pet={pet} />
           {showMessage && (

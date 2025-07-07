@@ -8,11 +8,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'tamagotchi-pink': '#FF6B9D',
-        'tamagotchi-purple': '#C66CFF',
-        'tamagotchi-blue': '#66D9EF',
-        'tamagotchi-yellow': '#FFE66D',
-        'tamagotchi-green': '#4ECDC4',
+        'pixelpet-pink': '#FF6B9D',
+        'pixelpet-purple': '#C66CFF',
+        'pixelpet-blue': '#66D9EF',
+        'pixelpet-yellow': '#FFE66D',
+        'pixelpet-green': '#4ECDC4',
       },
       animation: {
         'bounce-slow': 'bounce 2s infinite',

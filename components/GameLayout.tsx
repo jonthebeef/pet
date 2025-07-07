@@ -1,7 +1,7 @@
 'use client';
 
 import { Pet } from '@/lib/types';
-import TamagotchiDevice from './TamagotchiDevice';
+import PixelPetDevice from './PixelPetDevice';
 import Chat from './Chat';
 
 interface GameLayoutProps {
@@ -17,17 +17,17 @@ export default function GameLayout({ pet, onPetUpdate, playerName, playerAge, on
     <div className="min-h-screen bg-gradient-to-br from-purple-100 to-pink-100 p-4">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-tamagotchi-pink to-tamagotchi-purple bg-clip-text text-transparent">
-            {playerName}'s Tamagotchi
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-pixelpet-pink to-pixelpet-purple bg-clip-text text-transparent">
+            {playerName}'s PixelPet
           </h1>
           <p className="text-gray-600 mt-1">Take good care of {pet.name}!</p>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6" style={{ height: '80vh' }}>
-          {/* Left side - Tamagotchi Device (2/5 width on large screens) */}
+          {/* Left side - PixelPet Device (2/5 width on large screens) */}
           <div className="lg:col-span-2 h-full">
             <div className="h-full flex items-center justify-center">
-              <TamagotchiDevice pet={pet} onPetUpdate={onPetUpdate} />
+              <PixelPetDevice pet={pet} onPetUpdate={onPetUpdate} />
             </div>
           </div>
           
@@ -45,7 +45,7 @@ export default function GameLayout({ pet, onPetUpdate, playerName, playerAge, on
             </p>
             <button
               onClick={onNewPet}
-              className="bg-gradient-to-r from-tamagotchi-pink to-tamagotchi-purple text-white font-bold py-3 px-6 rounded-xl transform transition-all hover:scale-105 active:scale-95"
+              className="bg-gradient-to-r from-pixelpet-pink to-pixelpet-purple text-white font-bold py-3 px-6 rounded-xl transform transition-all hover:scale-105 active:scale-95"
             >
               Adopt a New Pet
             </button>

@@ -46,8 +46,8 @@ export default function ProfileSelector({ onSelectProfile }: ProfileSelectorProp
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-2xl w-full">
-        <h1 className="text-4xl font-bold text-center mb-8 bg-gradient-to-r from-tamagotchi-pink to-tamagotchi-purple bg-clip-text text-transparent">
-          Welcome to Tamagotchi! 🎮
+        <h1 className="text-4xl font-bold text-center mb-8 bg-gradient-to-r from-pixelpet-pink to-pixelpet-purple bg-clip-text text-transparent">
+          Welcome to PixelPet! 🎮
         </h1>
         
         {!showPetSelection ? (
@@ -63,7 +63,7 @@ export default function ProfileSelector({ onSelectProfile }: ProfileSelectorProp
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
                 placeholder="Enter your name"
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-tamagotchi-purple focus:outline-none text-lg"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-pixelpet-purple focus:outline-none text-lg"
               />
             </div>
             
@@ -84,7 +84,7 @@ export default function ProfileSelector({ onSelectProfile }: ProfileSelectorProp
                   placeholder="Enter your age"
                   min="1"
                   max="99"
-                  className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-tamagotchi-purple focus:outline-none text-lg"
+                  className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-pixelpet-purple focus:outline-none text-lg"
                 />
                 {userAge && (
                   <span className="text-3xl">{getAgeEmoji()}</span>
@@ -95,7 +95,7 @@ export default function ProfileSelector({ onSelectProfile }: ProfileSelectorProp
             <button
               onClick={handleContinue}
               disabled={!userName || !userAge}
-              className="w-full bg-gradient-to-r from-tamagotchi-pink to-tamagotchi-purple text-white font-bold py-4 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transform transition-all hover:scale-105 active:scale-95 shadow-lg"
+              className="w-full bg-gradient-to-r from-pixelpet-pink to-pixelpet-purple text-white font-bold py-4 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transform transition-all hover:scale-105 active:scale-95 shadow-lg"
             >
               Continue 🎯
             </button>
@@ -125,7 +125,7 @@ export default function ProfileSelector({ onSelectProfile }: ProfileSelectorProp
                 value={petName}
                 onChange={(e) => setPetName(e.target.value)}
                 placeholder="Give your pet a name"
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-tamagotchi-purple focus:outline-none text-lg"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-pixelpet-purple focus:outline-none text-lg"
               />
             </div>
             
@@ -140,7 +140,7 @@ export default function ProfileSelector({ onSelectProfile }: ProfileSelectorProp
                     onClick={() => setPetType(value)}
                     className={`p-4 rounded-xl border-2 transition-all ${
                       petType === value
-                        ? 'border-tamagotchi-purple bg-purple-50'
+                        ? 'border-pixelpet-purple bg-purple-50'
                         : 'border-gray-300 hover:border-gray-400'
                     }`}
                   >
@@ -154,7 +154,7 @@ export default function ProfileSelector({ onSelectProfile }: ProfileSelectorProp
             <button
               onClick={handleStart}
               disabled={!petName}
-              className="w-full bg-gradient-to-r from-tamagotchi-pink to-tamagotchi-purple text-white font-bold py-4 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transform transition-all hover:scale-105 active:scale-95 shadow-lg"
+              className="w-full bg-gradient-to-r from-pixelpet-pink to-pixelpet-purple text-white font-bold py-4 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transform transition-all hover:scale-105 active:scale-95 shadow-lg"
             >
               Start Playing! 🎮
             </button>
