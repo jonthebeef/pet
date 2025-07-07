@@ -21,6 +21,14 @@ export default function GameLayout({ pet, onPetUpdate, playerName, playerAge, on
             {playerName}'s PixelPet
           </h1>
           <p className="text-gray-600 mt-1">Take good care of {pet.name}!</p>
+          <div className="mt-4">
+            <button
+              onClick={onNewPet}
+              className="bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold py-2 px-4 rounded-lg text-sm transform transition-all hover:scale-105 active:scale-95"
+            >
+              🔄 Start Over
+            </button>
+          </div>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6" style={{ height: '80vh' }}>
