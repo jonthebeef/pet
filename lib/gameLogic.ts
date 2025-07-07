@@ -1,11 +1,11 @@
 import { Pet, PetStats, PetState, InteractionType, PetType } from './types';
 
 const STAT_DECAY_RATES = {
-  happiness: 4, // per hour (reduced from 8)
-  health: 1, // per hour (reduced from 2)
-  hunger: 6, // per hour (reduced from 12)
-  energy: 3, // per hour (reduced from 6)
-  cleanliness: 5, // per hour (reduced from 10)
+  happiness: 1, // per hour (much slower decay)
+  health: 0.05, // per hour (extremely slow decay)
+  hunger: 2, // per hour (slower decay)
+  energy: 1.5, // per hour (slower decay)
+  cleanliness: 1.5, // per hour (slower decay)
 };
 
 const LIFESPAN_RANGES = {
@@ -54,22 +54,21 @@ export function updatePetStats(pet: Pet): Pet {
     cleanliness: Math.max(0, pet.stats.cleanliness - STAT_DECAY_RATES.cleanliness * decayPerSecond),
   };
   
-  // Health deteriorates faster if other stats are low
-  if (newStats.hunger > 80 || newStats.cleanliness < 20) {
-    newStats.health = Math.max(0, newStats.health - 10);
+  // Health deteriorates gradually if other stats are very low
+  if (newStats.hunger > 90 || newStats.cleanliness < 10) {
+    newStats.health = Math.max(0, newStats.health - 0.5 * decayPerSecond);
   }
   
-  // Random chance of getting sick
-  if (Math.random() < 0.02 && newStats.health > 30) { // 2% chance per update
-    newStats.health = Math.max(20, newStats.health - 30);
+  // Random chance of getting sick (much lower chance)
+  if (Math.random() < 0.0001 && newStats.health > 50) { // 0.01% chance per update
+    newStats.health = Math.max(30, newStats.health - 20);
   }
   
   const newAge = pet.age + decayPerSecond; // Age increases by 1/3600 per second = 1 hour per 3600 seconds
   
-  // Check if pet should die
+  // Check if pet should die (less harsh conditions)
   const shouldDie = newStats.health === 0 || 
-                   newAge >= pet.lifeExpectancy ||
-                   (newStats.happiness === 0 && newStats.energy === 0);
+                   newAge >= pet.lifeExpectancy;
   
   const newState = shouldDie ? 'dead' : 
                   newStats.health < 30 ? 'sick' :
